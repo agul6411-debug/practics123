@@ -225,9 +225,8 @@ class _CommissionPaymentScreenState extends State<CommissionPaymentScreen> {
                 border: Border.all(color: const Color(0xffCCCCCC)),
               ),
               child: const Text(
-                'Pay this amount via Bank Transfer / JazzCash / EasyPaisa:\n'
-                '• Bank: HBL Account # 1234-5678-9012\n'
-                '• JazzCash / EasyPaisa: +92 311 7595866\n'
+                'Pay this amount via JazzCash:\n'
+                '• JazzCash: 03080780593\n'
                 'Take a screenshot or photo of your payment receipt and upload it below.',
                 style: TextStyle(color: Color(0xff212121), fontSize: 13, height: 1.4),
               ),

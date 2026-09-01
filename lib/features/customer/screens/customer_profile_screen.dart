@@ -197,7 +197,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 2),
-                                      Text('Phone Parts Finder Buyer', style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 12)),
+                                      Text('Mobile Part Finder Buyer', style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 12)),
                                     ],
                                   ),
                                 ),

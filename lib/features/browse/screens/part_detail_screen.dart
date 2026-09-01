@@ -314,8 +314,66 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                       ],
+
+                      // Bill Calculation Breakdown Box
+                      Builder(
+                        builder: (context) {
+                          final double itemPrice = double.tryParse((_partData?['price'] ?? 0).toString()) ?? 0.0;
+                          final double deliveryCharge = selectedDeliveryType == 'home_delivery' ? 200.0 : 0.0;
+                          final double totalBill = itemPrice + deliveryCharge;
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: theme.scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xffCCCCCC)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('💰 Order Bill Summary', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Part Amount:', style: TextStyle(fontSize: 12)),
+                                    Text('\$${itemPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(selectedDeliveryType == 'home_delivery' ? 'Delivery Fee:' : 'Pickup Fee:', style: const TextStyle(fontSize: 12)),
+                                    Text(
+                                      selectedDeliveryType == 'home_delivery' ? 'Rs. 200.00' : 'Rs. 0.00 (FREE)',
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: selectedDeliveryType == 'home_delivery' ? Colors.blue.shade800 : Colors.green.shade800),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(height: 16),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Total Bill Amount:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                                    Text(
+                                      selectedDeliveryType == 'home_delivery'
+                                          ? '\$${totalBill.toStringAsFixed(2)} (Incl. Rs. 200 Delivery)'
+                                          : '\$${itemPrice.toStringAsFixed(2)}',
+                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: theme.primaryColor),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 10),
                       SizedBox(
                         width: double.infinity,
                         height: 48,

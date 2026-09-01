@@ -49,7 +49,7 @@ class AppLogo extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: iconSize * 0.12),
                     child: Text(
-                      'PPF',
+                      'MPF',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: iconSize * 0.32,
@@ -76,7 +76,7 @@ class AppLogo extends StatelessWidget {
               ),
               children: [
                 const TextSpan(
-                  text: 'Phone Parts ',
+                  text: 'Mobile Part ',
                   style: TextStyle(color: Color(0xff0F172A)),
                 ),
                 TextSpan(

@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Phone Parts Finder',
+        title: 'Mobile Part Finder',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.appTheme,
         home: const SplashScreen(),

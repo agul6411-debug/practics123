@@ -97,7 +97,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Help keep Phone Parts Finder safe by reporting policy violations or fraudulent activity.',
+                'Help keep Mobile Part Finder safe by reporting policy violations or fraudulent activity.',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 24),

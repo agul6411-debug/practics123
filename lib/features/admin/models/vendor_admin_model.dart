@@ -10,6 +10,8 @@ class VendorAdminModel {
   final String? securityDepositStatus;
   final String? securityDepositProof;
   final double? securityDepositAmount;
+  final String? shopPhotoUrl;
+  final String? cnicPhotoUrl;
   final String ownerName;
   final String email;
   final String? phone;
@@ -24,6 +26,8 @@ class VendorAdminModel {
     this.securityDepositStatus,
     this.securityDepositProof,
     this.securityDepositAmount,
+    this.shopPhotoUrl,
+    this.cnicPhotoUrl,
     required this.ownerName,
     required this.email,
     this.phone,
@@ -42,6 +46,8 @@ class VendorAdminModel {
       securityDepositAmount: json['security_deposit_amount'] != null
           ? double.tryParse(json['security_deposit_amount'].toString())
           : null,
+      shopPhotoUrl: json['shop_photo_url'] ?? json['verification_docs'],
+      cnicPhotoUrl: json['cnic_photo_url'],
       ownerName: json['owner_name'] ?? '',
       email: json['owner_email'] ?? '',
       phone: json['owner_phone'],

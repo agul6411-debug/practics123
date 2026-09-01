@@ -11,6 +11,7 @@ import 'report_review_screen.dart';
 import 'user_management_screen.dart';
 import 'vendor_management_screen.dart';
 import 'system_settings_screen.dart';
+import 'admin_notification_center_screen.dart';
 import '../../chat/screens/chat_rooms_screen.dart';
 
 /// AdminDashboardScreen
@@ -34,6 +35,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     'Reports & Complaints',
     'Communication Oversight',
     'System Controls & Deposit',
+    'Notifications & Broadcast',
   ];
 
 
@@ -127,6 +129,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       const ReportReviewScreen(),
       const ChatRoomsScreen(),
       const SystemSettingsScreen(),
+      const AdminNotificationCenterScreen(),
     ];
 
     return Scaffold(
@@ -289,6 +292,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     icon: Icons.tune_rounded,
                     title: 'System Controls & Deposit',
                     index: 7,
+                    accentColor: const Color(0xff757575),
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.campaign_rounded,
+                    title: 'Notifications & Broadcast',
+                    index: 8,
                     accentColor: const Color(0xff757575),
                   ),
                 ],
