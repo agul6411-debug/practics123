@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/widgets/notification_bell_icon.dart';
 import '../../auth/services/auth_provider.dart';
 import '../models/part_model.dart';
 import '../services/vendor_service.dart';
-import 'add_edit_part_screen.dart';
 
 import 'vendor_dashboard_screen.dart';
+import '../../../routes.dart';
 
 /// MyPartsScreen
 /// Displays vendor inventory list with cyber-glassmorphic cards, price tags, QR actions, and stock badges.
@@ -115,10 +116,7 @@ class _MyPartsScreenState extends State<MyPartsScreen> {
               if (dashboard != null) {
                 dashboard.setTab(0);
               } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const VendorDashboardScreen(initialIndex: 0)),
-                );
+                Get.toNamed(AppRoutes.vendorDashboard, arguments: 0);
               }
             },
           ),
@@ -154,10 +152,7 @@ class _MyPartsScreenState extends State<MyPartsScreen> {
                       const SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const AddEditPartScreen()),
-                          );
+                          final result = await Get.toNamed(AppRoutes.addEditPart);
                           if (result == true || mounted) {
                             _loadParts();
                           }
@@ -236,7 +231,7 @@ class _MyPartsScreenState extends State<MyPartsScreen> {
                                             ),
                                           ),
                                           Text(
-                                            '\$${part.price.toStringAsFixed(2)}',
+                                            'Rs. ${part.price.toStringAsFixed(2)}',
                                             style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -313,12 +308,7 @@ class _MyPartsScreenState extends State<MyPartsScreen> {
                               children: [
                                 OutlinedButton.icon(
                                   onPressed: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => AddEditPartScreen(partToEdit: part),
-                                      ),
-                                    );
+                                    final result = await Get.toNamed(AppRoutes.addEditPart, arguments: part);
                                     if (result == true || mounted) {
                                       _loadParts();
                                     }
@@ -350,10 +340,7 @@ class _MyPartsScreenState extends State<MyPartsScreen> {
         icon: const Icon(Icons.add_rounded),
         label: const Text('Add Part', style: TextStyle(fontWeight: FontWeight.bold)),
         onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddEditPartScreen()),
-          );
+          final result = await Get.toNamed(AppRoutes.addEditPart);
           if (result == true || mounted) {
             _loadParts();
           }

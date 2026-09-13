@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
-import 'login_screen.dart';
+import '../../../routes.dart';
 
 /// HomePlaceholderScreen
 /// Temporary dashboard displayed after successful authentication.
@@ -42,15 +43,7 @@ class HomePlaceholderScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   await authProvider.logout();
-                  if (context.mounted) {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
-                      (route) => false,
-                    );
-                  }
+                  Get.offAllNamed(AppRoutes.login);
                 },
                 child: const Text('Logout'),
               ),

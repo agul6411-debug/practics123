@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../auth/services/auth_provider.dart';
 import '../services/chat_service.dart';
-import 'chat_screen.dart';
+import '../../../routes.dart';
 
 class ChatRoomsScreen extends StatefulWidget {
   const ChatRoomsScreen({super.key});
@@ -156,18 +157,16 @@ class _ChatRoomsScreenState extends State<ChatRoomsScreen> {
                           ),
                           trailing: const Icon(Icons.chevron_right_rounded, color: Colors.grey),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ChatScreen(
-                                  roomId: room.id,
-                                  roomTitle: room.modelName,
-                                  otherPartyName: isAdmin
-                                      ? 'System Audit Log'
-                                      : (room.otherName ?? 'Direct Messages'),
-                                ),
-                              ),
-                            ).then((_) => _loadRooms());
+                            Get.toNamed(
+                              AppRoutes.chatScreen,
+                              arguments: {
+                                'roomId': room.id,
+                                'roomTitle': room.modelName,
+                                'otherPartyName': isAdmin
+                                    ? 'System Audit Log'
+                                    : (room.otherName ?? 'Direct Messages'),
+                              },
+                            )?.then((_) => _loadRooms());
                           },
                         ),
                       );

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../core/widgets/app_logo.dart';
 import '../services/auth_service.dart';
-import 'login_screen.dart';
+import '../../../routes.dart';
 
 /// ResetPasswordScreen
 /// Screen for users to input 6-digit OTP received via Gmail and set their new password.
@@ -50,11 +51,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
 
       // Return to Login Screen
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
+      Get.offAllNamed(AppRoutes.login);
     } catch (e) {
       if (mounted) {
         final errorMsg = e.toString().replaceAll('Exception: ', '');

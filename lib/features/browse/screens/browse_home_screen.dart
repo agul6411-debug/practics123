@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/widgets/app_logo.dart';
 import '../../../core/widgets/notification_bell_icon.dart';
-import '../../admin/screens/admin_dashboard_screen.dart';
-import '../../auth/screens/login_screen.dart';
 import '../../auth/services/auth_provider.dart';
-import '../../customer/screens/customer_dashboard_screen.dart';
 import '../../vendor/models/category_model.dart';
-import '../../vendor/screens/vendor_dashboard_screen.dart';
 import '../models/browse_part_model.dart';
 import '../services/browse_service.dart';
-import 'part_detail_screen.dart';
+import '../../../routes.dart';
 
 /// BrowseHomeScreen
 /// OLX-style public marketplace homepage. Displays all available phone parts for public browsing with search filters.
@@ -101,15 +98,13 @@ class _BrowseHomeScreenState extends State<BrowseHomeScreen> {
   }
 
   void _navigateToDashboard(String role) {
-    Widget screen;
     if (role == 'admin') {
-      screen = const AdminDashboardScreen();
+      Get.toNamed(AppRoutes.adminDashboard);
     } else if (role == 'vendor') {
-      screen = const VendorDashboardScreen();
+      Get.toNamed(AppRoutes.vendorDashboard);
     } else {
-      screen = const CustomerDashboardScreen();
+      Get.toNamed(AppRoutes.customerDashboard);
     }
-    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
   @override
@@ -141,10 +136,7 @@ class _BrowseHomeScreenState extends State<BrowseHomeScreen> {
           ] else ...[
             TextButton.icon(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
+                Get.toNamed(AppRoutes.login);
               },
               icon: const Icon(Icons.login_rounded, size: 18),
               label: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -257,12 +249,7 @@ class _BrowseHomeScreenState extends State<BrowseHomeScreen> {
 
                             return InkWell(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PartDetailScreen(partId: part.id),
-                                  ),
-                                );
+                                Get.toNamed(AppRoutes.partDetail, arguments: part.id);
                               },
                               borderRadius: BorderRadius.circular(16),
                               child: Container(
@@ -339,7 +326,7 @@ class _BrowseHomeScreenState extends State<BrowseHomeScreen> {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                '\$${part.price.toStringAsFixed(2)}',
+                                                'Rs. ${part.price.toStringAsFixed(2)}',
                                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.primaryColor),
                                               ),
                                               Container(

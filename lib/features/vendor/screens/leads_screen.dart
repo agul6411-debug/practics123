@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../auth/services/auth_provider.dart';
-import '../../reports/screens/submit_report_screen.dart';
 import '../models/lead_request_model.dart';
 import '../services/vendor_service.dart';
-import 'my_commissions_screen.dart';
 
 import 'vendor_dashboard_screen.dart';
+import '../../../routes.dart';
 
 /// LeadsScreen
 /// Vendor interface to view received customer lead requests, respond to unlocked leads, or view locked lead obligations.
@@ -142,7 +142,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                   ),
                 ),
                 Text(
-                  '\$${lead.partPrice.toStringAsFixed(2)}',
+                  'Rs. ${lead.partPrice.toStringAsFixed(2)}',
                   style: const TextStyle(fontSize: 16, color: Color(0xff9E9E9E), fontWeight: FontWeight.bold),
                 ),
               ],
@@ -157,10 +157,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
               alignment: Alignment.centerRight,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyCommissionsScreen()),
-                  );
+                  Get.toNamed(AppRoutes.myCommissions);
                 },
                 icon: const Icon(Icons.payment, size: 18),
                 label: const Text('View Commission'),
@@ -339,8 +336,8 @@ class _LeadsScreenState extends State<LeadsScreen> {
             ],
             Text(
               lead.deliveryType == 'home_delivery'
-                  ? 'Part Price: \$${lead.partPrice.toStringAsFixed(2)} | Delivery Fee: Rs. 200 | Total Bill: \$${(lead.partPrice + 200).toStringAsFixed(2)}'
-                  : 'Part Price: \$${lead.partPrice.toStringAsFixed(2)} (Shop Pickup)',
+                  ? 'Part Price: Rs. ${lead.partPrice.toStringAsFixed(2)} | Delivery Fee: Rs. 200 | Total Bill: Rs. ${(lead.partPrice + 200).toStringAsFixed(2)}'
+                  : 'Part Price: Rs. ${lead.partPrice.toStringAsFixed(2)} (Shop Pickup)',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(height: 24),
@@ -350,14 +347,12 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 TextButton.icon(
                   onPressed: () {
                     if (lead.customerUserId == null) return;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SubmitReportScreen(
-                          reportedUserId: lead.customerUserId!,
-                          requestId: lead.id,
-                        ),
-                      ),
+                    Get.toNamed(
+                      AppRoutes.submitReport,
+                      arguments: {
+                        'reportedUserId': lead.customerUserId!,
+                        'requestId': lead.id,
+                      },
                     );
                   },
                   icon: const Icon(Icons.report_problem, size: 16, color: Colors.redAccent),
@@ -412,10 +407,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
               if (dashboard != null) {
                 dashboard.setTab(0);
               } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const VendorDashboardScreen(initialIndex: 0)),
-                );
+                Get.toNamed(AppRoutes.vendorDashboard, arguments: 0);
               }
             },
           ),

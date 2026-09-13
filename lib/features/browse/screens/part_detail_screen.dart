@@ -1,15 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/api_constants.dart';
-import '../../auth/screens/login_screen.dart';
-import '../../auth/screens/register_customer_screen.dart';
 import '../../auth/services/auth_provider.dart';
 import '../../customer/models/review_model.dart';
 import '../../customer/services/customer_service.dart';
 import '../services/browse_service.dart';
 import '../../chat/services/chat_service.dart';
-import '../../chat/screens/chat_screen.dart';
+import '../../../routes.dart';
 
 /// PartDetailScreen
 /// Displays comprehensive details for a specific phone part, vendor shop information, customer reviews,
@@ -118,16 +117,11 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
       final chatService = ChatService();
       final room = await chatService.createOrGetRoom(token, widget.partId);
       if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatScreen(
-              roomId: room.id,
-              roomTitle: room.modelName,
-              otherPartyName: room.otherName ?? 'Vendor',
-            ),
-          ),
-        );
+        Get.toNamed(AppRoutes.chatScreen, arguments: {
+          'roomId': room.id,
+          'roomTitle': room.modelName,
+          'otherPartyName': room.otherName ?? 'Vendor',
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -159,24 +153,14 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => RegisterCustomerScreen(returnToPartId: widget.partId),
-                ),
-              );
+              Get.toNamed(AppRoutes.registerCustomer, arguments: widget.partId);
             },
             child: const Text('Sign Up'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => LoginScreen(returnToPartId: widget.partId),
-                ),
-              );
+              Get.toNamed(AppRoutes.login, arguments: widget.partId);
             },
             child: const Text('Login'),
           ),
@@ -341,7 +325,7 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text('Part Amount:', style: TextStyle(fontSize: 12)),
-                                    Text('\$${itemPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                    Text('Rs. ${itemPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                                 const SizedBox(height: 4),
@@ -362,8 +346,8 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
                                     const Text('Total Bill Amount:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                                     Text(
                                       selectedDeliveryType == 'home_delivery'
-                                          ? '\$${totalBill.toStringAsFixed(2)} (Incl. Rs. 200 Delivery)'
-                                          : '\$${itemPrice.toStringAsFixed(2)}',
+                                          ? 'Rs. ${totalBill.toStringAsFixed(2)} (Incl. Rs. 200 Delivery)'
+                                          : 'Rs. ${itemPrice.toStringAsFixed(2)}',
                                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: theme.primaryColor),
                                     ),
                                   ],
@@ -586,7 +570,7 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
                   ),
                 ),
                 Text(
-                  '\$${price.toStringAsFixed(2)}',
+                  'Rs. ${price.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: theme.primaryColor),
                 ),
               ],

@@ -78,7 +78,7 @@ class RequestModel {
       createdAt: json['created_at'] ?? '',
       modelName: json['model_name'] ?? 'Part #${json['part_id']}',
       price: itemPrice,
-      imageUrl: json['image_url'],
+      imageUrl: json['original_photo_url'] ?? json['image_url'],
       shopName: json['shop_name'] ?? 'Vendor #${json['vendor_id']}',
       vendorCity: json['vendor_city'] ?? '',
       vendorAddress: json['vendor_address'] ?? '',

@@ -175,10 +175,12 @@ class _VendorManagementScreenState extends State<VendorManagementScreen> {
   void _showDepositReceiptViewer(VendorAdminModel vendor) {
     if (vendor.securityDepositProof == null || vendor.securityDepositProof!.isEmpty) return;
 
-    String proofUrl = vendor.securityDepositProof!;
-    if (proofUrl.startsWith('/')) {
-      proofUrl = '${ApiConstants.baseUrl}$proofUrl';
+    String initialUrl = vendor.securityDepositProof!;
+    if (initialUrl.startsWith('/')) {
+      initialUrl = '${ApiConstants.baseUrl}$initialUrl';
     }
+    String currentUrl = initialUrl;
+    bool triedFallback = false;
 
     showDialog(
       context: context,
@@ -221,26 +223,45 @@ class _VendorManagementScreenState extends State<VendorManagementScreen> {
                 constraints: const BoxConstraints(maxHeight: 450),
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    proofUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      padding: const EdgeInsets.all(24),
-                      color: Colors.red.withValues(alpha: 0.1),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.broken_image_rounded, color: Colors.red, size: 48),
-                          const SizedBox(height: 8),
-                          Text('Unable to load receipt photo: $error', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.red)),
-                          const SizedBox(height: 8),
-                          SelectableText(proofUrl, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                        ],
+                child: StatefulBuilder(
+                  builder: (dialogCtx, setDialogState) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        currentUrl,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          if (!triedFallback && currentUrl.contains('/uploads/commissions/')) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              setDialogState(() {
+                                triedFallback = true;
+                                currentUrl = currentUrl.replaceAll('/uploads/commissions/', '/uploads/parts/');
+                              });
+                            });
+                            return const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
+                          }
+                          return Container(
+                            padding: const EdgeInsets.all(24),
+                            color: Colors.red.withValues(alpha: 0.1),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.broken_image_rounded, color: Colors.red, size: 48),
+                                const SizedBox(height: 8),
+                                Text('Unable to load receipt photo: $error', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.red)),
+                                const SizedBox(height: 8),
+                                SelectableText(currentUrl, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
             ),

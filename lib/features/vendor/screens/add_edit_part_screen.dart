@@ -402,7 +402,7 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
                             controller: _priceController,
                             style: const TextStyle(color: Color(0xff212121)),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            decoration: _buildInputDecoration('Price (\$)', hint: '99.99', icon: Icons.attach_money_rounded),
+                            decoration: _buildInputDecoration('Price (Rs.)', hint: '1500', icon: Icons.payments_outlined),
                             validator: (val) {
                               if (val == null || val.trim().isEmpty) return 'Enter price';
                               if (double.tryParse(val.trim()) == null) return 'Invalid price';

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
-import 'email_otp_verification_screen.dart';
+import '../../../routes.dart';
 
 /// RegisterCustomerScreen
 /// Form screen for creating a new Customer account.
@@ -54,12 +55,10 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => EmailOtpVerificationScreen(email: registeredEmail),
-          ),
-        );
+        Get.offNamed(AppRoutes.emailOtpVerify, arguments: {
+          'email': registeredEmail,
+          'returnToPartId': widget.returnToPartId,
+        });
       }
     } catch (e) {
       if (mounted) {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/notifications/services/notification_provider.dart';
+import '../../routes.dart';
 
 /// NotificationBellIcon
 /// Shared AppBar action icon button featuring a red circular unread badge overlay.
@@ -20,10 +21,7 @@ class NotificationBellIcon extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.notifications),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                );
+                Get.toNamed(AppRoutes.notifications);
               },
             ),
             if (count > 0)

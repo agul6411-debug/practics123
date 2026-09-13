@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../core/widgets/app_logo.dart';
 import '../services/auth_service.dart';
-import 'reset_password_screen.dart';
+import '../../../routes.dart';
 
 /// ForgotPasswordScreen
 /// Allows users to request a password reset OTP code sent to their registered Gmail.
@@ -47,12 +48,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         SnackBar(content: Text(message), backgroundColor: Colors.green),
       );
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ResetPasswordScreen(email: email),
-        ),
-      );
+      Get.toNamed(AppRoutes.resetPassword, arguments: email);
     } catch (e) {
       if (mounted) {
         final errorMsg = e.toString().replaceAll('Exception: ', '');

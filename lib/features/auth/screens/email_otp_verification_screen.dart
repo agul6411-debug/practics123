@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../services/auth_service.dart';
-import 'login_screen.dart';
+import '../../../routes.dart';
 
 /// EmailOtpVerificationScreen
 /// Screen for verifying 6-digit Email OTP code sent via Mailtrap SMTP.
@@ -46,13 +47,7 @@ class _EmailOtpVerificationScreenState extends State<EmailOtpVerificationScreen>
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(ctx);
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => LoginScreen(returnToPartId: widget.returnToPartId),
-                    ),
-                    (route) => false,
-                  );
+                  Get.offAllNamed(AppRoutes.login, arguments: widget.returnToPartId);
                 },
                 child: const Text('Proceed to Login'),
               ),

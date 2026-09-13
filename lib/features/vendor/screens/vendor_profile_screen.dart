@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/notification_bell_icon.dart';
-import '../../auth/screens/login_screen.dart';
 import '../../auth/services/auth_provider.dart';
 import '../../notifications/services/notification_provider.dart';
-import '../../reports/screens/my_reports_screen.dart';
 import '../models/vendor_profile_model.dart';
 import '../services/vendor_service.dart';
+import '../../../routes.dart';
 
 /// VendorProfileScreen
 /// Displays vendor shop details, verification badge, edit dialog, reports, and sign-out actions with cyber styling.
@@ -316,10 +316,7 @@ class _VendorProfileScreenState extends State<VendorProfileScreen> {
                         height: 48,
                         child: OutlinedButton.icon(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const MyReportsScreen()),
-                            );
+                            Get.toNamed(AppRoutes.myReports);
                           },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xffFF5252),
@@ -341,13 +338,7 @@ class _VendorProfileScreenState extends State<VendorProfileScreen> {
                             final authProvider = Provider.of<AuthProvider>(context, listen: false);
                             final notifProvider = Provider.of<NotificationProvider>(context, listen: false);
                             await authProvider.logout(notificationProvider: notifProvider);
-                            if (context.mounted) {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                                (route) => false,
-                              );
-                            }
+                            Get.offAllNamed(AppRoutes.login);
                           },
                           icon: const Icon(Icons.logout_rounded, color: Colors.grey),
                           label: const Text('Sign Out of Account', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),

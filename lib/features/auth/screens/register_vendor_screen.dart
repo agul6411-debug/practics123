@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
-import 'email_otp_verification_screen.dart';
+import '../../../routes.dart';
 
 /// RegisterVendorScreen
 /// Form screen for creating a new Vendor account with mandatory Shop Photo & CNIC Photo uploads.
@@ -131,12 +132,7 @@ class _RegisterVendorScreenState extends State<RegisterVendorScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => EmailOtpVerificationScreen(email: registeredEmail),
-          ),
-        );
+        Get.offNamed(AppRoutes.emailOtpVerify, arguments: {'email': registeredEmail});
       }
     } catch (e) {
       if (mounted) {

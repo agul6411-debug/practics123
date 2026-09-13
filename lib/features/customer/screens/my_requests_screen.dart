@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/notification_bell_icon.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../auth/services/auth_provider.dart';
-import '../../reports/screens/submit_report_screen.dart';
 import '../models/request_model.dart';
 import '../services/customer_service.dart';
-import 'add_review_screen.dart';
-import 'qr_scanner_screen.dart';
-
 import 'customer_dashboard_screen.dart';
+import '../../../routes.dart';
 
 /// MyRequestsScreen
 /// Displays customer request history with glowing status badges and review/report actions.
@@ -85,10 +83,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
               if (dashboard != null) {
                 dashboard.setTab(0);
               } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CustomerDashboardScreen(initialIndex: 0)),
-                );
+                Get.toNamed(AppRoutes.customerDashboard, arguments: 0);
               }
             },
           ),
@@ -266,11 +261,11 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                  Column(
                                    crossAxisAlignment: CrossAxisAlignment.start,
                                    children: [
-                                     Text(
-                                       req.deliveryType == 'home_delivery'
-                                           ? 'Total Bill: \$${(req.totalAmount > 0 ? req.totalAmount : req.price + 200).toStringAsFixed(2)}'
-                                           : 'Total Bill: \$${req.price.toStringAsFixed(2)}',
-                                       style: TextStyle(
+                                      Text(
+                                        req.deliveryType == 'home_delivery'
+                                            ? 'Total Bill: Rs. ${(req.totalAmount > 0 ? req.totalAmount : req.price + 200).toStringAsFixed(2)}'
+                                            : 'Total Bill: Rs. ${req.price.toStringAsFixed(2)}',
+                                        style: TextStyle(
                                          fontWeight: FontWeight.bold,
                                          color: theme.primaryColor,
                                          fontSize: 15,
@@ -301,15 +296,10 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                               children: [
                                 TextButton.icon(
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => SubmitReportScreen(
-                                          reportedUserId: req.vendorUserId ?? req.vendorId,
-                                          requestId: req.id,
-                                        ),
-                                      ),
-                                    );
+                                    Get.toNamed(AppRoutes.submitReport, arguments: {
+                                      'reportedUserId': req.vendorUserId ?? req.vendorId,
+                                      'requestId': req.id,
+                                    });
                                   },
                                   icon: const Icon(Icons.report_problem_rounded, size: 16, color: Color(0xffDC2626)),
                                   label: const Text('Report Vendor', style: TextStyle(color: Color(0xffDC2626), fontSize: 12, fontWeight: FontWeight.bold)),
@@ -317,15 +307,10 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                 if (canReview) ...[
                                   ElevatedButton.icon(
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => QrScannerScreen(
-                                            partId: req.partId,
-                                            requestId: req.id,
-                                          ),
-                                        ),
-                                      );
+                                      Get.toNamed(AppRoutes.qrScanner, arguments: {
+                                        'partId': req.partId,
+                                        'requestId': req.id,
+                                      });
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: theme.primaryColor,
@@ -338,12 +323,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                   ),
                                   ElevatedButton.icon(
                                     onPressed: () async {
-                                      final updated = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => AddReviewScreen(request: req),
-                                        ),
-                                      );
+                                      final updated = await Get.toNamed(AppRoutes.addReview, arguments: req);
                                       if (updated == true && mounted) {
                                         _loadRequests();
                                       }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/notification_bell_icon.dart';
 import '../../../core/constants/api_constants.dart';
@@ -8,6 +9,7 @@ import '../models/search_result_model.dart';
 import '../services/customer_service.dart';
 
 import 'customer_dashboard_screen.dart';
+import '../../../routes.dart';
 
 /// SearchScreen
 /// Allows customers to search for parts by brand, part type, model, and city,
@@ -178,10 +180,7 @@ class _SearchScreenState extends State<SearchScreen> {
               if (dashboard != null) {
                 dashboard.setTab(0);
               } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CustomerDashboardScreen(initialIndex: 0)),
-                );
+                Get.toNamed(AppRoutes.customerDashboard, arguments: 0);
               }
             },
           ),
@@ -366,14 +365,14 @@ class _SearchScreenState extends State<SearchScreen> {
                                                             ),
                                                           ),
                                                         ),
-                                                        Text(
-                                                          '\$${part.price.toStringAsFixed(2)}',
-                                                          style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: theme.primaryColor,
-                                                          ),
-                                                        ),
+                                                         Text(
+                                                           'Rs. ${part.price.toStringAsFixed(2)}',
+                                                           style: TextStyle(
+                                                             fontSize: 18,
+                                                             fontWeight: FontWeight.bold,
+                                                             color: theme.primaryColor,
+                                                           ),
+                                                         ),
                                                       ],
                                                     ),
                                                     const SizedBox(height: 4),

@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/app_logo.dart';
 import '../services/auth_provider.dart';
-import '../../admin/screens/admin_dashboard_screen.dart';
-import '../../customer/screens/customer_dashboard_screen.dart';
 import '../../notifications/services/notification_provider.dart';
-import '../../vendor/screens/vendor_dashboard_screen.dart';
-import '../../browse/screens/part_detail_screen.dart';
-import 'register_customer_screen.dart';
-import 'register_vendor_screen.dart';
-import 'email_otp_verification_screen.dart';
-import 'forgot_password_screen.dart';
+import '../../../routes.dart';
 
 /// LoginScreen
 /// Entry point for authenticating users featuring official PPF branding logo.
@@ -51,12 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (user.role == 'admin') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const AdminDashboardScreen(),
-          ),
-        );
+        Get.offAllNamed(AppRoutes.adminDashboard);
         return;
       } else if (user.role == 'vendor') {
         if (user.verificationStatus == 'pending') {
@@ -72,29 +61,14 @@ class _LoginScreenState extends State<LoginScreen> {
           );
           return;
         } else if (user.verificationStatus == 'approved') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const VendorDashboardScreen(),
-            ),
-          );
+          Get.offAllNamed(AppRoutes.vendorDashboard);
           return;
         }
       } else if (user.role == 'customer') {
         if (widget.returnToPartId != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => PartDetailScreen(partId: widget.returnToPartId!),
-            ),
-          );
+          Get.offAllNamed(AppRoutes.partDetail, arguments: widget.returnToPartId);
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const CustomerDashboardScreen(),
-            ),
-          );
+          Get.offAllNamed(AppRoutes.customerDashboard);
         }
         return;
       }
@@ -117,15 +91,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => EmailOtpVerificationScreen(
-                          email: inputEmail,
-                          returnToPartId: widget.returnToPartId,
-                        ),
-                      ),
-                    );
+                    Get.toNamed(AppRoutes.emailOtpVerify, arguments: {
+                      'email': inputEmail,
+                      'returnToPartId': widget.returnToPartId,
+                    });
                   },
                   child: const Text('Enter OTP Code'),
                 ),
@@ -245,15 +214,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ForgotPasswordScreen(
-                                  initialEmail: _emailController.text.trim().isNotEmpty
-                                      ? _emailController.text.trim()
-                                      : null,
-                                ),
-                              ),
+                            Get.toNamed(AppRoutes.forgotPassword,
+                              arguments: _emailController.text.trim().isNotEmpty
+                                  ? _emailController.text.trim()
+                                  : null,
                             );
                           },
                           child: const Text('Forgot Password?'),
@@ -288,24 +252,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     TextButton.icon(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => RegisterCustomerScreen(returnToPartId: widget.returnToPartId),
-                          ),
-                        );
+                        Get.toNamed(AppRoutes.registerCustomer, arguments: widget.returnToPartId);
                       },
                       icon: Icon(Icons.person_add_rounded, size: 18, color: Theme.of(context).primaryColor),
                       label: Text('Customer Signup', style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
                     ),
                     TextButton.icon(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterVendorScreen(),
-                          ),
-                        );
+                        Get.toNamed(AppRoutes.registerVendor);
                       },
                       icon: Icon(Icons.storefront_rounded, size: 18, color: Theme.of(context).primaryColor),
                       label: Text('Vendor Signup', style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),

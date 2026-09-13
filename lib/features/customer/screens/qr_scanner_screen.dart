@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../auth/services/auth_provider.dart';
-import '../../reports/screens/submit_report_screen.dart';
 import '../services/customer_service.dart';
+import '../../../routes.dart';
 
 /// QrScannerScreen
 /// Rebuilt as Delivery Verification flow: compares physically scanned barcode against the vendor's declared listing & reference photos.
@@ -327,15 +328,10 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pop(ctx, true);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => SubmitReportScreen(
-                            reportedUserId: vendorUserId,
-                            requestId: widget.requestId,
-                          ),
-                        ),
-                      );
+                      Get.toNamed(AppRoutes.submitReport, arguments: {
+                        'reportedUserId': vendorUserId,
+                        'requestId': widget.requestId,
+                      });
                     },
                     icon: const Icon(Icons.report_problem_rounded, size: 18),
                     label: const Text('Report Fraudulent Vendor Now', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -529,15 +525,10 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.pop(ctx, true);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => SubmitReportScreen(
-                                  reportedUserId: vendorUserId,
-                                  requestId: widget.requestId,
-                                ),
-                              ),
-                            );
+                            Get.toNamed(AppRoutes.submitReport, arguments: {
+                              'reportedUserId': vendorUserId,
+                              'requestId': widget.requestId,
+                            });
                           },
                           icon: const Icon(Icons.report_problem_rounded, size: 16),
                           label: const Text('Report Vendor', style: TextStyle(fontWeight: FontWeight.bold)),

@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/app_logo.dart';
-import '../../admin/screens/admin_dashboard_screen.dart';
-import '../../browse/screens/browse_home_screen.dart';
 import '../../auth/services/auth_provider.dart';
-import '../../customer/screens/customer_dashboard_screen.dart';
-import '../../vendor/screens/vendor_dashboard_screen.dart';
+import '../../../routes.dart';
 
 /// SplashScreen
 /// Initial landing screen displaying the PPF branding logo with entrance animations,
@@ -65,37 +63,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     if (isLoggedIn && authProvider.currentUser != null) {
       final role = authProvider.currentUser!.role.toLowerCase();
-      Widget targetScreen;
-
       if (role == 'admin') {
-        targetScreen = const AdminDashboardScreen();
+        Get.offAllNamed(AppRoutes.adminDashboard);
       } else if (role == 'vendor') {
-        targetScreen = const VendorDashboardScreen();
+        Get.offAllNamed(AppRoutes.vendorDashboard);
       } else {
-        targetScreen = const CustomerDashboardScreen();
+        Get.offAllNamed(AppRoutes.customerDashboard);
       }
-
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, anim1, anim2) => targetScreen,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 600),
-        ),
-      );
     } else {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, anim1, anim2) => const BrowseHomeScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 600),
-        ),
-      );
+      Get.offAllNamed(AppRoutes.browseHome);
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/constants/api_constants.dart';
 import '../../auth/services/auth_provider.dart';
 import '../../vendor/models/commission_model.dart';
 import '../services/admin_service.dart';
@@ -50,7 +51,11 @@ class _CommissionReviewScreenState extends State<CommissionReviewScreen> {
   }
 
   Future<void> _openProofUrl(String urlString) async {
-    final Uri uri = Uri.parse(urlString);
+    String fullUrl = urlString;
+    if (fullUrl.startsWith('/')) {
+      fullUrl = '${ApiConstants.baseUrl}$fullUrl';
+    }
+    final Uri uri = Uri.parse(fullUrl);
     try {
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
         if (mounted) {
@@ -62,10 +67,144 @@ class _CommissionReviewScreenState extends State<CommissionReviewScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invalid URL: $urlString'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Invalid URL: $fullUrl'), backgroundColor: Colors.red),
         );
       }
     }
+  }
+
+  void _showPaymentProofViewer(CommissionModel comm) {
+    if (comm.paymentProofUrl == null || comm.paymentProofUrl!.isEmpty) return;
+
+    String initialUrl = comm.paymentProofUrl!;
+    if (initialUrl.startsWith('/')) {
+      initialUrl = '${ApiConstants.baseUrl}$initialUrl';
+    }
+    String currentUrl = initialUrl;
+    bool triedFallback = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${comm.vendorShopName ?? 'Vendor'} — Payment Proof',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Fee: Rs. ${comm.amount.toStringAsFixed(2)} • Commission #${comm.id}',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: Container(
+                constraints: const BoxConstraints(maxHeight: 450),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: StatefulBuilder(
+                  builder: (dialogCtx, setDialogState) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        currentUrl,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          if (!triedFallback && currentUrl.contains('/uploads/commissions/')) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              setDialogState(() {
+                                triedFallback = true;
+                                currentUrl = currentUrl.replaceAll('/uploads/commissions/', '/uploads/parts/');
+                              });
+                            });
+                            return const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
+                          }
+                          return Container(
+                            padding: const EdgeInsets.all(24),
+                            color: Colors.red.withValues(alpha: 0.1),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.broken_image_rounded, color: Colors.red, size: 48),
+                                const SizedBox(height: 8),
+                                Text('Unable to load receipt photo: $error', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.red)),
+                                const SizedBox(height: 8),
+                                SelectableText(currentUrl, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => _openProofUrl(currentUrl),
+                    icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                    label: const Text('Browser', style: TextStyle(fontSize: 12)),
+                  ),
+                  const Spacer(),
+                  if (comm.status == 'pending_verification') ...[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _handleReject(comm);
+                      },
+                      child: const Text('Reject', style: TextStyle(color: Colors.red)),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _handleVerify(comm);
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff00E676)),
+                      child: const Text('Verify & Unlock', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                    ),
+                  ] else
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Close'),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _handleVerify(CommissionModel comm) async {
@@ -76,7 +215,7 @@ class _CommissionReviewScreenState extends State<CommissionReviewScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Verify Commission Payment', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Text(
-          'Verify payment of \$${comm.amount.toStringAsFixed(2)} from "${comm.vendorShopName ?? 'Vendor'}" and unlock customer leads?',
+          'Verify payment of Rs. ${comm.amount.toStringAsFixed(2)} from "${comm.vendorShopName ?? 'Vendor'}" and unlock customer leads?',
           style: const TextStyle(color: Colors.grey),
         ),
         actions: [
@@ -302,7 +441,7 @@ class _CommissionReviewScreenState extends State<CommissionReviewScreen> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Commission Due: \$${comm.amount.toStringAsFixed(2)}',
+                                        'Commission Due: Rs. ${comm.amount.toStringAsFixed(2)}',
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -329,8 +468,8 @@ class _CommissionReviewScreenState extends State<CommissionReviewScreen> {
                                     children: [
                                       if (hasProof)
                                         OutlinedButton.icon(
-                                          onPressed: () => _openProofUrl(comm.paymentProofUrl!),
-                                          icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                                          onPressed: () => _showPaymentProofViewer(comm),
+                                          icon: const Icon(Icons.receipt_long_rounded, size: 16),
                                           label: const Text('View Payment Proof'),
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: const Color(0xff00E5FF),

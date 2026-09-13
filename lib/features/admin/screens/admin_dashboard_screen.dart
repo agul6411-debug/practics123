@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/notification_bell_icon.dart';
-import '../../auth/screens/login_screen.dart';
 import '../../auth/services/auth_provider.dart';
 import '../../notifications/services/notification_provider.dart';
+import '../../../routes.dart';
 import 'category_management_screen.dart';
 import 'commission_review_screen.dart';
 import 'dashboard_stats_screen.dart';
@@ -321,13 +322,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   final authProvider = Provider.of<AuthProvider>(context, listen: false);
                   final notifProvider = Provider.of<NotificationProvider>(context, listen: false);
                   await authProvider.logout(notificationProvider: notifProvider);
-                  if (context.mounted) {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
-                  }
+                  Get.offAllNamed(AppRoutes.login);
                 },
               ),
             ),

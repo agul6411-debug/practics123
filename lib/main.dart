@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/services/auth_provider.dart';
 import 'features/notifications/services/notification_provider.dart';
-import 'features/splash/screens/splash_screen.dart';
+import 'routes.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 /// MyApp
-/// Root Widget of the Phone Parts Finder application.
-/// Sets up state management (MultiProvider), app theme, and splash screen entry point.
+/// Root Widget of the Mobile Part Finder application.
+/// Sets up state management (MultiProvider), GetMaterialApp with named routes, app theme.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -24,11 +25,12 @@ class MyApp extends StatelessWidget {
           create: (_) => NotificationProvider(),
         ),
       ],
-      child: MaterialApp(
+      child: GetMaterialApp(
         title: 'Mobile Part Finder',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.appTheme,
-        home: const SplashScreen(),
+        initialRoute: AppRoutes.splash,
+        getPages: AppRoutes.pages,
       ),
     );
   }

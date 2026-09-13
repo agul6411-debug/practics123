@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/notification_bell_icon.dart';
 import '../../notifications/services/notification_provider.dart';
 import '../../auth/services/auth_provider.dart';
 import '../models/commission_model.dart';
 import '../services/vendor_service.dart';
-import 'commission_payment_screen.dart';
+import '../../../routes.dart';
 
 /// MyCommissionsScreen
 /// Displays vendor commissions list with status badges and navigation to payment submission.
@@ -117,11 +118,9 @@ class _MyCommissionsScreenState extends State<MyCommissionsScreen> {
                             borderRadius: BorderRadius.circular(16),
                             onTap: isActionable
                                 ? () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => CommissionPaymentScreen(commission: comm),
-                                      ),
+                                    final result = await Get.toNamed(
+                                      AppRoutes.commissionPayment,
+                                      arguments: comm,
                                     );
                                     if (result == true || mounted) {
                                       _loadCommissions();
@@ -137,7 +136,7 @@ class _MyCommissionsScreenState extends State<MyCommissionsScreen> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        '10% Fee: \$${comm.amount.toStringAsFixed(2)}',
+                                        '10% Fee: Rs. ${comm.amount.toStringAsFixed(2)}',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
