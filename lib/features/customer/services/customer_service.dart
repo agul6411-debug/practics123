@@ -152,4 +152,24 @@ class CustomerService {
     );
     return response;
   }
+
+  /// Confirms manual receipt of part delivery (Option 2 - Manual Confirmation)
+  Future<void> confirmDelivery(String token, int requestId) async {
+    await _apiClient.post(
+      '/customer/requests/$requestId/confirm-delivery',
+      {},
+      token: token,
+    );
+  }
+
+  /// Submits an account deletion request with reason to admin
+  Future<void> requestAccountDeletion(String token, String reason) async {
+    await _apiClient.post(
+      '/auth/request-deletion',
+      {'reason': reason},
+      token: token,
+    );
+  }
 }
+
+

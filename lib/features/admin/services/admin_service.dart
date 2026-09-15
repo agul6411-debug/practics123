@@ -13,6 +13,8 @@ class AdminDashboardStats {
   final int totalParts;
   final int totalRequests;
   final int pendingVendorApprovals;
+  final int totalPartsSold;
+  final double totalSalesGMV;
 
   AdminDashboardStats({
     required this.totalVendors,
@@ -20,6 +22,8 @@ class AdminDashboardStats {
     required this.totalParts,
     required this.totalRequests,
     required this.pendingVendorApprovals,
+    this.totalPartsSold = 0,
+    this.totalSalesGMV = 0.0,
   });
 
   factory AdminDashboardStats.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,8 @@ class AdminDashboardStats {
       totalParts: json['totalParts'] ?? 0,
       totalRequests: json['totalRequests'] ?? 0,
       pendingVendorApprovals: json['pendingVendorApprovals'] ?? 0,
+      totalPartsSold: json['totalPartsSold'] ?? 0,
+      totalSalesGMV: (json['totalSalesGMV'] != null) ? double.parse(json['totalSalesGMV'].toString()) : 0.0,
     );
   }
 }
@@ -44,6 +50,24 @@ class AdminService {
   Future<AdminDashboardStats> getDashboardStats(String token) async {
     final response = await _apiClient.get('/admin/dashboard', token: token);
     return AdminDashboardStats.fromJson(response['data']);
+  }
+
+  /// Fetches verified sales proof list
+  Future<List<Map<String, dynamic>>> getSalesProof(String token) async {
+    final response = await _apiClient.get('/admin/sales-proof', token: token);
+    final List list = response['data'] ?? [];
+    return List<Map<String, dynamic>>.from(list);
+  }
+
+  /// Fetches 360-degree deep profile analytics for any user (Vendor or Customer)
+  Future<Map<String, dynamic>> getUser360(String token, int userId) async {
+    final response = await _apiClient.get('/admin/users/$userId/360', token: token);
+    return Map<String, dynamic>.from(response);
+  }
+
+  /// Permanently deletes a user account (vendor or customer)
+  Future<void> deleteUser(String token, int userId) async {
+    await _apiClient.delete('/admin/users/$userId', token: token);
   }
 
   /// Fetches vendor list with optional status filter

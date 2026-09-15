@@ -48,13 +48,193 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
     }
   }
 
+  Future<void> _showSalesProofDialog() async {
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+            future: _adminService.getSalesProof(token),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error loading sales proof: ${snapshot.error}'));
+              }
+
+              final sales = snapshot.data ?? [];
+              final double totalGmv = sales.fold(0.0, (acc, item) {
+                final double amount = double.tryParse((item['total_amount'] ?? item['part_price'] ?? 0).toString()) ?? 0.0;
+                return acc + amount;
+              });
+
+              return Column(
+                children: [
+                  // Handle Bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Verified Platform Sales Proof',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              '${sales.length} Verified Deliveries • Total: Rs. ${totalGmv.toStringAsFixed(2)}',
+                              style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: sales.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No parts delivered yet.\nOnce customers confirm delivery or scan QR, sales will appear here.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: sales.length,
+                            itemBuilder: (context, index) {
+                              final sale = sales[index];
+                              final double price = double.tryParse((sale['total_amount'] ?? sale['part_price'] ?? 0).toString()) ?? 0.0;
+                              final verifiedDate = sale['verified_at'] != null ? sale['verified_at'].toString().split('T').first : 'Delivered';
+
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            sale['model_name'] ?? 'Part Component',
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                          ),
+                                        ),
+                                        Text(
+                                          'Rs. ${price.toStringAsFixed(2)}',
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.green),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Brand: ${sale['brand_name'] ?? 'N/A'} • Type: ${sale['part_type_name'] ?? 'N/A'}',
+                                      style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.storefront_rounded, size: 14, color: Colors.purple),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            'Vendor: ${sale['shop_name']} (${sale['vendor_city'] ?? ''})',
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.person_rounded, size: 14, color: Colors.blue),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            'Buyer: ${sale['customer_name']} (${sale['customer_phone'] ?? ''})',
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: const Text(
+                                            '✅ SALE COMPLETED',
+                                            style: TextStyle(color: Colors.green, fontSize: 9, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Text(
+                                          'Date: $verifiedDate',
+                                          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildStatCard({
     required String label,
-    required int value,
+    required dynamic value,
     required IconData icon,
     required Color accentColor,
     required VoidCallback onTap,
     String? subtitle,
+    bool isCurrency = false,
   }) {
     final theme = Theme.of(context);
     return Material(
@@ -113,20 +293,23 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    value.toString(),
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: theme.textTheme.bodyLarge?.color,
-                      letterSpacing: 0.5,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      isCurrency ? 'Rs. ${value.toStringAsFixed(0)}' : value.toString(),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: theme.textTheme.bodyLarge?.color,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     label,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: theme.textTheme.bodyMedium?.color,
                     ),
@@ -141,6 +324,7 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -229,14 +413,14 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
                         ),
                         const SizedBox(height: 14),
 
-                        // Stats Grid (optimized childAspectRatio to 1.35 to prevent text overflow on mobile)
+                        // Stats Grid (optimized childAspectRatio to 1.25 to prevent text overflow on mobile)
                         GridView.count(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           crossAxisCount: 2,
                           crossAxisSpacing: 14,
                           mainAxisSpacing: 14,
-                          childAspectRatio: 1.35,
+                          childAspectRatio: 1.25,
                           children: [
                             _buildStatCard(
                               label: 'Total Vendors',
@@ -270,9 +454,27 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
                               subtitle: 'LEADS',
                               onTap: () => widget.onTabChanged?.call(4), // Navigates to Commission Review
                             ),
+                            _buildStatCard(
+                              label: 'Parts Sold',
+                              value: _stats!.totalPartsSold,
+                              icon: Icons.verified_rounded,
+                              accentColor: const Color(0xff00E676),
+                              subtitle: 'DELIVERED',
+                              onTap: _showSalesProofDialog,
+                            ),
+                            _buildStatCard(
+                              label: 'Total Sales (GMV)',
+                              value: _stats!.totalSalesGMV,
+                              icon: Icons.monetization_on_rounded,
+                              accentColor: const Color(0xff00E676),
+                              subtitle: 'SALES PROOF',
+                              isCurrency: true,
+                              onTap: _showSalesProofDialog,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 20),
+
 
                         // Pending Approvals Banner (Clickable)
                         Material(

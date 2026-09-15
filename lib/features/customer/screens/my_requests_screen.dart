@@ -52,19 +52,66 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     }
   }
 
+  Future<void> _handleConfirmDelivery(RequestModel req) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Confirm Package Received', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('Did you receive the component "${req.modelName}" from "${req.shopName}" in good condition?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No, Not Yet')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff00E676)),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Yes, Received!', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) return;
+
+
+    try {
+      await _customerService.confirmDelivery(token, req.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Delivery confirmed! Sale completed successfully.'), backgroundColor: Colors.green),
+        );
+        _loadRequests();
+      }
+    } catch (e) {
+      if (mounted) {
+        final msg = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
+      case 'delivered':
+        return const Color(0xff00E676);
       case 'available':
         return const Color(0xff00E676);
       case 'responded':
         return const Color(0xff00E5FF);
       case 'not_available':
         return const Color(0xffFF5252);
+      case 'cancelled':
+        return const Color(0xffEF4444);
       case 'requested':
       default:
         return const Color(0xffFFC400);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +157,9 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                     itemCount: _requests.length,
                     itemBuilder: (context, index) {
                       final req = _requests[index];
-                      final bool canReview = req.status == 'responded' || req.status == 'available';
+                      final bool isDelivered = req.status.toLowerCase() == 'delivered';
+                      final bool canConfirmDelivery = (req.status == 'responded' || req.status == 'available') && !isDelivered;
+                      final bool canReview = req.status == 'responded' || req.status == 'available' || isDelivered;
                       final statusColor = _getStatusColor(req.status);
 
                       final theme = Theme.of(context);
@@ -177,9 +226,11 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                               border: Border.all(color: statusColor.withValues(alpha: 0.5)),
                                             ),
                                             child: Text(
-                                              req.status == 'available'
-                                                  ? '🏷️ BOOKED / SOLD'
-                                                  : req.status.replaceAll('_', ' ').toUpperCase(),
+                                              isDelivered
+                                                  ? '✅ DELIVERED'
+                                                  : req.status == 'available'
+                                                      ? '🏷️ AVAILABLE / READY'
+                                                      : req.status.replaceAll('_', ' ').toUpperCase(),
                                               style: TextStyle(
                                                 color: statusColor,
                                                 fontWeight: FontWeight.bold,
@@ -304,7 +355,18 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                   icon: const Icon(Icons.report_problem_rounded, size: 16, color: Color(0xffDC2626)),
                                   label: const Text('Report Vendor', style: TextStyle(color: Color(0xffDC2626), fontSize: 12, fontWeight: FontWeight.bold)),
                                 ),
-                                if (canReview) ...[
+                                if (canConfirmDelivery) ...[
+                                  ElevatedButton.icon(
+                                    onPressed: () => _handleConfirmDelivery(req),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xff00E676),
+                                      foregroundColor: Colors.black,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    ),
+                                    icon: const Icon(Icons.check_circle_outline_rounded, size: 16),
+                                    label: const Text('Confirm Received', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                  ),
                                   ElevatedButton.icon(
                                     onPressed: () {
                                       Get.toNamed(AppRoutes.qrScanner, arguments: {
@@ -316,11 +378,13 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                       backgroundColor: theme.primaryColor,
                                       foregroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     ),
                                     icon: const Icon(Icons.qr_code_scanner_rounded, size: 16),
-                                    label: const Text('Verify Delivery', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                    label: const Text('Scan QR', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                                   ),
+                                ],
+                                if (canReview)
                                   ElevatedButton.icon(
                                     onPressed: () async {
                                       final updated = await Get.toNamed(AppRoutes.addReview, arguments: req);
@@ -332,17 +396,17 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                       backgroundColor: Colors.amber,
                                       foregroundColor: Colors.black,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     ),
                                     icon: const Icon(Icons.star_rounded, size: 16, color: Colors.black),
-                                    label: const Text('Review', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                    label: const Text('Review', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                                   ),
-                                ],
                               ],
                             ),
                           ],
                         ),
                       );
+
                     },
                   ),
                 ),

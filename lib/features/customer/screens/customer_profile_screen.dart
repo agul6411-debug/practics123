@@ -110,7 +110,79 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     );
   }
 
+  void _showDeleteAccountDialog() {
+    final reasonController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final theme = Theme.of(context);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: theme.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Request Account Deletion', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Are you sure you want to delete your account? Your request will be sent to the administrator to permanently remove your data.',
+                style: TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: reasonController,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  labelText: 'Reason for Deletion (Optional)',
+                  hintText: 'e.g. No longer using app',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(dialogCtx);
+              final token = Provider.of<AuthProvider>(context, listen: false).token;
+              if (token == null) return;
+
+              try {
+                await _customerService.requestAccountDeletion(token, reasonController.text.trim());
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Account deletion request submitted to Admin.'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  final msg = e.toString().replaceAll('Exception: ', '');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(msg), backgroundColor: Colors.red),
+                  );
+                }
+              }
+            },
+            child: const Text('Submit Request', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoTile(IconData icon, String label, String value) {
+
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -240,6 +312,23 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                           ),
                           icon: const Icon(Icons.report_problem_rounded, color: Color(0xffDC2626)),
                           label: const Text('My Reports & Complaints', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Request Account Deletion Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton.icon(
+                          onPressed: _showDeleteAccountDialog,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red.shade700,
+                            side: BorderSide(color: Colors.red.shade300),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
+                          label: const Text('Request Account Deletion', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                         ),
                       ),
                       const SizedBox(height: 20),

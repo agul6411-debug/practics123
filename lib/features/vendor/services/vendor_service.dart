@@ -172,4 +172,14 @@ class VendorService {
     final List list = response['data'] ?? [];
     return list.map((item) => CategoryModel.fromJson(item)).toList();
   }
+
+  /// Requests account deletion
+  Future<void> requestAccountDeletion(String token, String reason) async {
+    await _apiClient.post(
+      '/auth/request-deletion',
+      {'reason': reason},
+      token: token,
+    );
+  }
 }
+

@@ -7,6 +7,8 @@ class UserAdminModel {
   final String? phone;
   final String role;
   final String status;
+  final bool isEmailVerified;
+  final String? createdAt;
 
   UserAdminModel({
     required this.id,
@@ -15,7 +17,11 @@ class UserAdminModel {
     this.phone,
     required this.role,
     required this.status,
+    this.isEmailVerified = false,
+    this.createdAt,
   });
+
+  bool get isDeletionRequested => status.toLowerCase() == 'deletion_pending';
 
   factory UserAdminModel.fromJson(Map<String, dynamic> json) {
     return UserAdminModel(
@@ -25,6 +31,9 @@ class UserAdminModel {
       phone: json['phone'],
       role: json['role'] ?? 'customer',
       status: json['status'] ?? 'active',
+      isEmailVerified: json['is_email_verified'] == 1 || json['is_email_verified'] == true,
+      createdAt: json['created_at'],
     );
   }
 }
+
