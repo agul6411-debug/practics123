@@ -504,43 +504,40 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                   ),
                 ),
               ] else ...[
-                Row(
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.center,
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.pop(ctx, false);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xffCCCCCC)),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: const Text('Scan Again', style: TextStyle(color: Color(0xff212121))),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx, false);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xffCCCCCC)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                       ),
+                      child: const Text('Scan Again', style: TextStyle(color: Color(0xff212121))),
                     ),
-                    if (vendorUserId != null) ...[
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pop(ctx, true);
-                            Get.toNamed(AppRoutes.submitReport, arguments: {
-                              'reportedUserId': vendorUserId,
-                              'requestId': widget.requestId,
-                            });
-                          },
-                          icon: const Icon(Icons.report_problem_rounded, size: 16),
-                          label: const Text('Report Vendor', style: TextStyle(fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xffFF5252),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
+                    if (vendorUserId != null)
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(ctx, true);
+                          Get.toNamed(AppRoutes.submitReport, arguments: {
+                            'reportedUserId': vendorUserId,
+                            'requestId': widget.requestId,
+                          });
+                        },
+                        icon: const Icon(Icons.report_problem_rounded, size: 16),
+                        label: const Text('Report Vendor', style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xffFF5252),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
                         ),
                       ),
-                    ],
                   ],
                 ),
               ],

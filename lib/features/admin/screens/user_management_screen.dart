@@ -284,7 +284,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               children: [
                                 _buildMiniStat('📦 Parts Listed', '${stats['totalParts'] ?? 0} Items', Colors.blue),
                                 _buildMiniStat('💰 Parts Sold', '${stats['totalSold'] ?? 0} Verified', Colors.green),
-                                _buildMiniStat('💵 Gross Earnings', 'Rs. ${(stats['totalEarnings'] ?? 0).toStringAsFixed(0)}', Colors.green),
                                 _buildMiniStat('❌ Order Cancels', '${stats['cancellationsCount'] ?? 0} / 3 Max', Colors.orange),
                                 _buildMiniStat('🏷️ Comm. Payable', 'Rs. ${(stats['totalCommissionPayable'] ?? 0).toStringAsFixed(0)}', Colors.purple),
                                 _buildMiniStat('💳 Comm. Paid', 'Rs. ${(stats['totalCommissionPaid'] ?? 0).toStringAsFixed(0)}', Colors.teal),

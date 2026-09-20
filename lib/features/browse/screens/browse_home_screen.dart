@@ -236,7 +236,7 @@ class _BrowseHomeScreenState extends State<BrowseHomeScreen> {
                           padding: const EdgeInsets.all(14.0),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.72,
+                            childAspectRatio: 0.65,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
                           ),
@@ -325,10 +325,17 @@ class _BrowseHomeScreenState extends State<BrowseHomeScreen> {
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                'Rs. ${part.price.toStringAsFixed(2)}',
-                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.primaryColor),
+                                              Expanded(
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Text(
+                                                    'Rs. ${part.price.toStringAsFixed(2)}',
+                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.primaryColor),
+                                                  ),
+                                                ),
                                               ),
+                                              const SizedBox(width: 4),
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                 decoration: BoxDecoration(

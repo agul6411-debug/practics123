@@ -341,8 +341,11 @@ class _LeadsScreenState extends State<LeadsScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 TextButton.icon(
                   onPressed: () {
@@ -358,33 +361,28 @@ class _LeadsScreenState extends State<LeadsScreen> {
                   icon: const Icon(Icons.report_problem, size: 16, color: Colors.redAccent),
                   label: const Text('Report Customer', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
                 ),
-                Wrap(
-                  spacing: 6,
-                  children: [
-                    if (canRespond) ...[
-                      OutlinedButton(
-                        onPressed: () => _handleRespond(lead, 'not_available'),
-                        style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
-                        child: const Text('Not Available'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => _handleRespond(lead, 'available'),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                        child: const Text('Available'),
-                      ),
-                    ],
-                    if (canCancel)
-                      OutlinedButton.icon(
-                        onPressed: () => _handleCancelOrder(lead),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          side: const BorderSide(color: Colors.red),
-                        ),
-                        icon: const Icon(Icons.cancel_outlined, size: 14),
-                        label: const Text('Cancel Order', style: TextStyle(fontSize: 12)),
-                      ),
-                  ],
-                ),
+                if (canRespond) ...[
+                  OutlinedButton(
+                    onPressed: () => _handleRespond(lead, 'not_available'),
+                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                    child: const Text('Not Available'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _handleRespond(lead, 'available'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    child: const Text('Available'),
+                  ),
+                ],
+                if (canCancel)
+                  OutlinedButton.icon(
+                    onPressed: () => _handleCancelOrder(lead),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                    ),
+                    icon: const Icon(Icons.cancel_outlined, size: 14),
+                    label: const Text('Cancel Order', style: TextStyle(fontSize: 12)),
+                  ),
               ],
             ),
           ],

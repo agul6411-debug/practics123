@@ -161,10 +161,14 @@ class VendorDashboardScreenState extends State<VendorDashboardScreen> {
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: const Color(0xff00E5FF)),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
                           const Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.phone_android_rounded, color: Color(0xff00E5FF), size: 20),
                               SizedBox(width: 8),

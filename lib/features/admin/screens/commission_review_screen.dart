@@ -489,8 +489,10 @@ class _CommissionReviewScreenState extends State<CommissionReviewScreen> {
                                     const SizedBox(height: 16),
                                     const Divider(color: Color(0xffCCCCCC), height: 1),
                                     const SizedBox(height: 14),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                    Wrap(
+                                      alignment: WrapAlignment.end,
+                                      spacing: 8,
+                                      runSpacing: 8,
                                       children: [
                                         OutlinedButton.icon(
                                           onPressed: () => _handleReject(comm),
@@ -502,7 +504,6 @@ class _CommissionReviewScreenState extends State<CommissionReviewScreen> {
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
                                         ElevatedButton.icon(
                                           onPressed: () => _handleVerify(comm),
                                           icon: const Icon(Icons.check_circle_outline_rounded, size: 18),

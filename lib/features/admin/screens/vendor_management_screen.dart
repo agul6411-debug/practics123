@@ -643,16 +643,17 @@ class _VendorManagementScreenState extends State<VendorManagementScreen> {
                                   const SizedBox(height: 14),
 
                                   // Owner Info Row
-                                  Row(
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    spacing: 6,
+                                    runSpacing: 4,
                                     children: [
                                       const Icon(Icons.person_outline_rounded, size: 16, color: Colors.grey),
-                                      const SizedBox(width: 8),
                                       Text(
                                         vendor.ownerName,
-                                        style: const TextStyle(color: Color(0xff212121), fontWeight: FontWeight.w500),
+                                        style: TextStyle(color: theme.textTheme.bodyLarge?.color, fontWeight: FontWeight.w500),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text('(${vendor.email})', style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+                                      Text('(${vendor.email})', style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 12)),
                                     ],
                                   ),
                                   const SizedBox(height: 6),
@@ -665,19 +666,19 @@ class _VendorManagementScreenState extends State<VendorManagementScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade800,
+                                          color: theme.primaryColor.withValues(alpha: 0.15),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
                                           vendor.city,
-                                          style: const TextStyle(color: Color(0xff212121), fontSize: 11, fontWeight: FontWeight.bold),
+                                          style: TextStyle(color: theme.primaryColor, fontSize: 11, fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
                                           vendor.address,
-                                          style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                                          style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 13),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
@@ -690,7 +691,7 @@ class _VendorManagementScreenState extends State<VendorManagementScreen> {
                                       children: [
                                         const Icon(Icons.phone_outlined, size: 16, color: Colors.grey),
                                         const SizedBox(width: 8),
-                                        Text(vendor.phone!, style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+                                        Text(vendor.phone!, style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 13)),
                                       ],
                                     ),
                                   ],
@@ -699,29 +700,32 @@ class _VendorManagementScreenState extends State<VendorManagementScreen> {
 
                                   if (isPending) ...[
                                     const SizedBox(height: 16),
-                                    const Divider(color: Color(0xffCCCCCC), height: 1),
+                                    const Divider(color: Color(0xffE2E8F0), height: 1),
                                     const SizedBox(height: 14),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                    Wrap(
+                                      alignment: WrapAlignment.end,
+                                      spacing: 8,
+                                      runSpacing: 8,
                                       children: [
                                         OutlinedButton.icon(
                                           onPressed: () => _handleReject(vendor),
-                                          icon: const Icon(Icons.close_rounded, size: 18),
-                                          label: const Text('Reject'),
+                                          icon: const Icon(Icons.close_rounded, size: 16),
+                                          label: const Text('Reject', style: TextStyle(fontSize: 12)),
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: const Color(0xffFF5252),
                                             side: const BorderSide(color: Color(0xffFF5252)),
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
                                         ElevatedButton.icon(
                                           onPressed: () => _handleApprove(vendor),
-                                          icon: const Icon(Icons.check_rounded, size: 18),
-                                          label: const Text('Approve Application'),
+                                          icon: const Icon(Icons.check_rounded, size: 16),
+                                          label: const Text('Approve Application', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: const Color(0xff00E676),
                                             foregroundColor: Colors.black,
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                           ),
                                         ),
@@ -731,6 +735,7 @@ class _VendorManagementScreenState extends State<VendorManagementScreen> {
                                 ],
                               ),
                             );
+
                           },
                         ),
                       ),

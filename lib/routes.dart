@@ -113,7 +113,11 @@ class AppRoutes {
     GetPage(name: resetPassword,     page: () => ResetPasswordScreen(email: (Get.arguments as String?) ?? '')),
 
     // Browse
-    GetPage(name: partDetail,        page: () => PartDetailScreen(partId: Get.arguments as int)),
+    GetPage(name: partDetail,        page: () {
+      final a = Get.arguments;
+      final partId = (a is int) ? a : int.tryParse(a?.toString() ?? '1') ?? 1;
+      return PartDetailScreen(partId: partId);
+    }),
 
     // Customer
     GetPage(name: customerDashboard, page: () {
@@ -127,8 +131,10 @@ class AppRoutes {
     GetPage(name: addReview,         page: () => AddReviewScreen(request: Get.arguments as RequestModel)),
     // arguments: {'partId': int, 'requestId': int?}
     GetPage(name: qrScanner,         page: () {
-      final a = Get.arguments as Map<String, dynamic>;
-      return QrScannerScreen(partId: a['partId'] as int, requestId: a['requestId'] as int?);
+      final a = Get.arguments is Map ? (Get.arguments as Map) : {};
+      final partId = (a['partId'] is int) ? a['partId'] as int : int.tryParse(a['partId']?.toString() ?? '0') ?? 0;
+      final reqId = (a['requestId'] is int) ? a['requestId'] as int : int.tryParse(a['requestId']?.toString() ?? '');
+      return QrScannerScreen(partId: partId, requestId: reqId);
     }),
 
     // Vendor
@@ -160,21 +166,26 @@ class AppRoutes {
     GetPage(name: chatRooms,         page: () => const ChatRoomsScreen()),
     // arguments: {'roomId': int, 'roomTitle': String, 'otherPartyName': String?}
     GetPage(name: chatScreen,        page: () {
-      final a = Get.arguments as Map<String, dynamic>;
+      final a = Get.arguments is Map ? (Get.arguments as Map) : {};
+      final roomId = (a['roomId'] is int) ? a['roomId'] as int : int.tryParse(a['roomId']?.toString() ?? '0') ?? 0;
+      final roomTitle = a['roomTitle']?.toString() ?? 'Chat Conversation';
+      final otherPartyName = a['otherPartyName']?.toString() ?? 'Direct Message';
       return ChatScreen(
-        roomId: a['roomId'] as int,
-        roomTitle: a['roomTitle'] as String,
-        otherPartyName: a['otherPartyName'] as String? ?? 'User',
+        roomId: roomId,
+        roomTitle: roomTitle,
+        otherPartyName: otherPartyName,
       );
     }),
     GetPage(name: notifications,     page: () => const NotificationsScreen()),
     GetPage(name: myReports,         page: () => const MyReportsScreen()),
     // arguments: {'reportedUserId': int, 'requestId': int?}
     GetPage(name: submitReport,      page: () {
-      final a = Get.arguments as Map<String, dynamic>;
+      final a = Get.arguments is Map ? (Get.arguments as Map) : {};
+      final reportedUserId = (a['reportedUserId'] is int) ? a['reportedUserId'] as int : int.tryParse(a['reportedUserId']?.toString() ?? '0') ?? 0;
+      final reqId = (a['requestId'] is int) ? a['requestId'] as int : int.tryParse(a['requestId']?.toString() ?? '');
       return SubmitReportScreen(
-        reportedUserId: a['reportedUserId'] as int,
-        requestId: a['requestId'] as int?,
+        reportedUserId: reportedUserId,
+        requestId: reqId,
       );
     }),
   ];

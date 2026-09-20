@@ -112,42 +112,6 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  Future<void> _handleRequest(SearchResultModel part) async {
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) return;
-
-    try {
-      await _customerService.createRequest(token, part.id);
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            backgroundColor: Theme.of(context).cardColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Text('Request Sent to Vendor', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            content: Text(
-              'Your request for "${part.modelName}" was sent to ${part.shopName}. Visit the shop to inspect and pay on the spot.',
-              style: const TextStyle(color: Colors.grey),
-            ),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.pop(ctx),
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff00E5FF)),
-                child: const Text('Got It', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        final msg = e.toString().replaceAll('Exception: ', '');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg), backgroundColor: Colors.red),
-        );
-      }
-    }
-  }
 
   InputDecoration _buildInputDecoration(String label) {
     return InputDecoration(
@@ -311,116 +275,144 @@ class _SearchScreenState extends State<SearchScreen> {
                                   itemBuilder: (context, index) {
                                     final part = _searchResults[index];
                                     final theme = Theme.of(context);
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 16.0),
-                                      padding: const EdgeInsets.all(18.0),
-                                      decoration: BoxDecoration(
-                                        color: theme.cardColor,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(color: const Color(0xffE2E8F0)),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              // Part Photo Thumbnail
-                                              Container(
-                                                width: 65,
-                                                height: 65,
-                                                decoration: BoxDecoration(
-                                                  color: theme.scaffoldBackgroundColor,
-                                                  borderRadius: BorderRadius.circular(12),
-                                                  border: Border.all(color: const Color(0xffCCCCCC)),
+                                    return InkWell(
+                                      onTap: () {
+                                        Get.toNamed(AppRoutes.partDetail, arguments: part.id);
+                                      },
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(bottom: 16.0),
+                                        padding: const EdgeInsets.all(18.0),
+                                        decoration: BoxDecoration(
+                                          color: theme.cardColor,
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(color: const Color(0xffE2E8F0)),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                // Part Photo Thumbnail
+                                                Container(
+                                                  width: 65,
+                                                  height: 65,
+                                                  decoration: BoxDecoration(
+                                                    color: theme.scaffoldBackgroundColor,
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(color: const Color(0xffCCCCCC)),
+                                                  ),
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    child: part.imageUrl != null && part.imageUrl!.isNotEmpty
+                                                        ? Image.network(
+                                                            part.imageUrl!.startsWith('http')
+                                                                ? part.imageUrl!
+                                                                : '${ApiConstants.baseUrl}${part.imageUrl}',
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.build_circle_rounded, size: 36, color: Colors.grey),
+                                                          )
+                                                        : const Icon(Icons.build_circle_rounded, size: 36, color: Colors.grey),
+                                                  ),
                                                 ),
-                                                child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  child: part.imageUrl != null && part.imageUrl!.isNotEmpty
-                                                      ? Image.network(
-                                                          part.imageUrl!.startsWith('http')
-                                                              ? part.imageUrl!
-                                                              : '${ApiConstants.baseUrl}${part.imageUrl}',
-                                                          fit: BoxFit.cover,
-                                                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.build_circle_rounded, size: 36, color: Colors.grey),
-                                                        )
-                                                      : const Icon(Icons.build_circle_rounded, size: 36, color: Colors.grey),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        Expanded(
-                                                          child: Text(
-                                                            part.modelName,
-                                                            style: TextStyle(
-                                                              fontSize: 17,
-                                                              fontWeight: FontWeight.bold,
-                                                              color: theme.textTheme.bodyLarge?.color,
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Expanded(
+                                                            child: Text(
+                                                              part.modelName,
+                                                              style: TextStyle(
+                                                                fontSize: 17,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: theme.textTheme.bodyLarge?.color,
+                                                              ),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.ellipsis,
                                                             ),
                                                           ),
-                                                        ),
-                                                         Text(
-                                                           'Rs. ${part.price.toStringAsFixed(2)}',
-                                                           style: TextStyle(
-                                                             fontSize: 18,
-                                                             fontWeight: FontWeight.bold,
-                                                             color: theme.primaryColor,
-                                                           ),
-                                                         ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 4),
+                                                          const SizedBox(width: 8),
+                                                          FittedBox(
+                                                            fit: BoxFit.scaleDown,
+                                                            child: Text(
+                                                              'Rs. ${part.price.toStringAsFixed(2)}',
+                                                              style: TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: theme.primaryColor,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        '${part.brandName ?? 'Brand'} • ${part.partTypeName ?? 'Type'} • ${part.conditionType.toUpperCase()}',
+                                                        style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 12),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.storefront_rounded, size: 16, color: Colors.grey),
+                                                const SizedBox(width: 6),
+                                                Expanded(
+                                                  child: Text(
+                                                    '${part.shopName} (${part.vendorCity})',
+                                                    style: TextStyle(fontWeight: FontWeight.w600, color: theme.textTheme.bodyLarge?.color),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
+                                                const SizedBox(width: 4),
+                                                FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Text(
+                                                    '${part.averageRating} ★ (${part.reviewCount})',
+                                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.amber),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 14),
+                                            const Divider(color: Color(0xffE2E8F0), height: 1),
+                                            const SizedBox(height: 12),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
+                                                  'Tap to view specs, authenticity & order',
+                                                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                                                ),
+                                                Row(
+                                                  children: [
                                                     Text(
-                                                      '${part.brandName ?? 'Brand'} • ${part.partTypeName ?? 'Type'} • ${part.conditionType.toUpperCase()}',
-                                                      style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 12),
+                                                      'View Details',
+                                                      style: TextStyle(
+                                                        color: theme.primaryColor,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 13,
+                                                      ),
                                                     ),
+                                                    const SizedBox(width: 4),
+                                                    Icon(Icons.arrow_forward_ios_rounded, size: 12, color: theme.primaryColor),
                                                   ],
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 12),
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.storefront_rounded, size: 16, color: Colors.grey),
-                                              const SizedBox(width: 6),
-                                              Expanded(
-                                                child: Text(
-                                                  '${part.shopName} (${part.vendorCity})',
-                                                  style: TextStyle(fontWeight: FontWeight.w600, color: theme.textTheme.bodyLarge?.color),
-                                                ),
-                                              ),
-                                              const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                '${part.averageRating} ★ (${part.reviewCount})',
-                                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.amber),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 14),
-                                          const Divider(color: Color(0xffE2E8F0), height: 1),
-                                          const SizedBox(height: 12),
-                                          Align(
-                                            alignment: Alignment.centerRight,
-                                            child: ElevatedButton.icon(
-                                              onPressed: () => _handleRequest(part),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: theme.primaryColor,
-                                                foregroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                              ),
-                                              icon: const Icon(Icons.send_rounded, size: 16),
-                                              label: const Text('Request This Part', style: TextStyle(fontWeight: FontWeight.bold)),
+                                              ],
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     );
                                   },

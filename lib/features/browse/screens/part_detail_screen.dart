@@ -578,7 +578,9 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
             const SizedBox(height: 16),
 
             // Specs Pill Row
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -592,7 +594,6 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
                     style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.primaryColor),
                   ),
                 ),
-                const SizedBox(width: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
@@ -670,8 +671,11 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       const Text(
                         'Manufacturer Barcode / QR:',
@@ -821,69 +825,96 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          border: const Border(top: BorderSide(color: Color(0xffCCCCCC))),
-        ),
-        child: SizedBox(
-          height: 50,
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _isRequesting ? null : _handleChatAction,
-                  icon: const Icon(Icons.chat_bubble_outline_rounded),
-                  label: const Text(
-                    'Chat with Vendor',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: theme.primaryColor, width: 1.5),
-                    foregroundColor: theme.primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: (_isRequesting || stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
-                      ? null
-                      : _handleRequestAction,
-                  icon: Icon(
-                    (stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
-                        ? Icons.block_rounded
-                        : Icons.receipt_long_rounded,
-                  ),
-                  label: _isRequesting
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : Text(
-                          (stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
-                              ? 'SOLD OUT'
-                              : 'Request Part',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: (stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
-                        ? Colors.red.shade700
-                        : theme.primaryColor,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.red.shade200,
-                    disabledForegroundColor: Colors.red.shade800,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-            ],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            border: const Border(top: BorderSide(color: Color(0xffCCCCCC))),
           ),
+          child: (Provider.of<AuthProvider>(context).currentUser?.role.toLowerCase() == 'vendor')
+              ? Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.store_mall_directory_rounded, color: theme.primaryColor, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Marketplace Catalog (Vendor Reference View)',
+                        style: TextStyle(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : SizedBox(
+                  height: 50,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _isRequesting ? null : _handleChatAction,
+                          icon: const Icon(Icons.chat_bubble_outline_rounded),
+                          label: const Text(
+                            'Chat with Vendor',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: theme.primaryColor, width: 1.5),
+                            foregroundColor: theme.primaryColor,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: (_isRequesting || stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
+                              ? null
+                              : _handleRequestAction,
+                          icon: Icon(
+                            (stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
+                                ? Icons.block_rounded
+                                : Icons.receipt_long_rounded,
+                          ),
+                          label: _isRequesting
+                              ? const SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                )
+                              : Text(
+                                  (stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
+                                      ? 'SOLD OUT'
+                                      : 'Request Part',
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: (stock <= 0 || (_partData!['status'] ?? '').toString().toLowerCase() == 'out_of_stock')
+                                ? Colors.red.shade700
+                                : theme.primaryColor,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.red.shade200,
+                            disabledForegroundColor: Colors.red.shade800,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
         ),
       ),
     );

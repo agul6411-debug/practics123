@@ -136,137 +136,141 @@ class _LoginScreenState extends State<LoginScreen> {
     final isLoading = Provider.of<AuthProvider>(context).isLoading;
 
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 36.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Header Logo (Uses custom vector text logic styled to light background compatibility)
-                const AppLogo(
-                  iconSize: 90,
-                  fontSize: 24,
-                ),
-                const SizedBox(height: 32),
-
-                // Card Container
-                Container(
-                  padding: const EdgeInsets.all(22.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xffCCCCCC)),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 36.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Header Logo (Uses custom vector text logic styled to light background compatibility)
+                  const AppLogo(
+                    iconSize: 90,
+                    fontSize: 24,
                   ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Welcome Back',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Sign in to access parts & lead requests',
-                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                      ),
-                      const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
-                      TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: 'Email Address',
-                          prefixIcon: Icon(Icons.email_rounded, size: 20),
+                  // Card Container
+                  Container(
+                    padding: const EdgeInsets.all(22.0),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xffCCCCCC)),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Welcome Back',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
-                          if (!emailRegex.hasMatch(value.trim())) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Sign in to access parts & lead requests',
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                        ),
+                        const SizedBox(height: 24),
 
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock_rounded, size: 20),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            Get.toNamed(AppRoutes.forgotPassword,
-                              arguments: _emailController.text.trim().isNotEmpty
-                                  ? _emailController.text.trim()
-                                  : null,
-                            );
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: const InputDecoration(
+                            labelText: 'Email Address',
+                            prefixIcon: Icon(Icons.email_rounded, size: 20),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+                            if (!emailRegex.hasMatch(value.trim())) {
+                              return 'Please enter a valid email address';
+                            }
+                            return null;
                           },
-                          child: const Text('Forgot Password?'),
                         ),
-                      ),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : _handleLogin,
-                          child: isLoading
-                              ? const SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text('Sign In'),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: Icon(Icons.lock_rounded, size: 20),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            return null;
+                          },
                         ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Get.toNamed(AppRoutes.forgotPassword,
+                                arguments: _emailController.text.trim().isNotEmpty
+                                    ? _emailController.text.trim()
+                                    : null,
+                              );
+                            },
+                            child: const Text('Forgot Password?'),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: isLoading ? null : _handleLogin,
+                            child: isLoading
+                                ? const SizedBox(
+                                    height: 22,
+                                    width: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('Sign In'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  Wrap(
+                    alignment: WrapAlignment.spaceEvenly,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () {
+                          Get.toNamed(AppRoutes.registerCustomer, arguments: widget.returnToPartId);
+                        },
+                        icon: Icon(Icons.person_add_rounded, size: 18, color: Theme.of(context).primaryColor),
+                        label: Text('Customer Signup', style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
+                      ),
+                      TextButton.icon(
+                        onPressed: () {
+                          Get.toNamed(AppRoutes.registerVendor);
+                        },
+                        icon: Icon(Icons.storefront_rounded, size: 18, color: Theme.of(context).primaryColor),
+                        label: Text('Vendor Signup', style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 24),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        Get.toNamed(AppRoutes.registerCustomer, arguments: widget.returnToPartId);
-                      },
-                      icon: Icon(Icons.person_add_rounded, size: 18, color: Theme.of(context).primaryColor),
-                      label: Text('Customer Signup', style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
-                    ),
-                    TextButton.icon(
-                      onPressed: () {
-                        Get.toNamed(AppRoutes.registerVendor);
-                      },
-                      icon: Icon(Icons.storefront_rounded, size: 18, color: Theme.of(context).primaryColor),
-                      label: Text('Vendor Signup', style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

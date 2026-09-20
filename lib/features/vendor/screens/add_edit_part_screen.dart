@@ -139,10 +139,10 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
 
     final bool isEditing = widget.partToEdit != null;
 
-    // Photos are required when adding a new part
-    if (!isEditing && (_originalPhotoBytes == null || _barcodePhotoBytes == null)) {
+    // Original photo is required when adding a new part
+    if (!isEditing && _originalPhotoBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Both Original Photo and Barcode Photo are required for verification.')),
+        const SnackBar(content: Text('Original Product Photo is required.')),
       );
       return;
     }
@@ -178,6 +178,12 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
       files['barcodePhoto'] = {
         'bytes': _barcodePhotoBytes!,
         'filename': _barcodePhoto!.name,
+      };
+    } else if (_originalPhotoBytes != null && _originalPhoto != null) {
+      // Fallback barcodePhoto to originalPhoto for used parts without separate packaging
+      files['barcodePhoto'] = {
+        'bytes': _originalPhotoBytes!,
+        'filename': _originalPhoto!.name,
       };
     }
 
@@ -444,15 +450,16 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Identification Type Dropdown (Barcode vs QR Code)
+                    // Identification Type Dropdown (Barcode vs QR Code vs Standard)
                     DropdownButtonFormField<String>(
                       initialValue: _selectedCodeType,
                       dropdownColor: Theme.of(context).cardColor,
                       style: const TextStyle(color: Color(0xff212121)),
                       decoration: _buildInputDecoration('Identification Type', icon: Icons.qr_code_scanner_rounded),
                       items: const [
-                        DropdownMenuItem(value: 'qr', child: Text('QR Code (Auto-generated if no number entered)')),
-                        DropdownMenuItem(value: 'barcode', child: Text('Barcode (Number required)')),
+                        DropdownMenuItem(value: 'qr', child: Text('QR Code (Auto-generated unique token)')),
+                        DropdownMenuItem(value: 'none', child: Text('Standard / Used Part (No physical barcode)')),
+                        DropdownMenuItem(value: 'barcode', child: Text('Printed Barcode (Enter number)')),
                       ],
                       onChanged: (val) {
                         if (val != null) setState(() => _selectedCodeType = val);
@@ -460,29 +467,31 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Barcode / QR text field
-                    TextFormField(
-                      controller: _barcodeNumberController,
-                      style: const TextStyle(color: Color(0xff212121)),
-                      decoration: _buildInputDecoration(
-                        _selectedCodeType == 'barcode' ? 'Barcode Number *' : 'QR Serial / Code Number (Optional)',
-                        hint: _selectedCodeType == 'barcode'
-                            ? 'Enter printed barcode serial number'
-                            : 'Optional: System auto-generates unique QR token if left empty',
-                        icon: Icons.qr_code_2_rounded,
+                    // Barcode / QR text field (Visible unless 'none')
+                    if (_selectedCodeType != 'none') ...[
+                      TextFormField(
+                        controller: _barcodeNumberController,
+                        style: const TextStyle(color: Color(0xff212121)),
+                        decoration: _buildInputDecoration(
+                          _selectedCodeType == 'barcode' ? 'Barcode Number *' : 'QR Serial / Code Number (Optional)',
+                          hint: _selectedCodeType == 'barcode'
+                              ? 'Enter printed barcode serial number'
+                              : 'Optional: System auto-generates unique token if left empty',
+                          icon: Icons.qr_code_2_rounded,
+                        ),
+                        validator: (val) {
+                          if (_selectedCodeType == 'barcode' && (val == null || val.trim().isEmpty)) {
+                            return 'Barcode Number is required for barcode products';
+                          }
+                          return null;
+                        },
                       ),
-                      validator: (val) {
-                        if (_selectedCodeType == 'barcode' && (val == null || val.trim().isEmpty)) {
-                          return 'Barcode Number is required for barcode products';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
+                    ],
 
                     // Image Upload Section 1
                     _buildPhotoPickerSection(
-                      title: 'Original Product Photo',
+                      title: 'Original Product Photo *',
                       subtitle: 'Upload a clear picture showing the physical product state.',
                       isOriginalPhoto: true,
                       selectedBytes: _originalPhotoBytes,
@@ -492,8 +501,8 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
 
                     // Image Upload Section 2
                     _buildPhotoPickerSection(
-                      title: 'Barcode / Packaging Photo',
-                      subtitle: 'Upload a clear picture of the manufacturer barcode sticker.',
+                      title: 'Barcode / Packaging Photo (Optional for Used Parts)',
+                      subtitle: 'Upload a picture of barcode sticker if available, or packaging.',
                       isOriginalPhoto: false,
                       selectedBytes: _barcodePhotoBytes,
                       existingUrl: widget.partToEdit?.barcodePhotoUrl,

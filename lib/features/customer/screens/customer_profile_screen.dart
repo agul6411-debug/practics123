@@ -50,10 +50,12 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     }
   }
 
-  void _showEditCityDialog() {
+  void _showEditProfileDialog() {
     if (_profile == null) return;
 
-    final cityController = TextEditingController(text: _profile!['city']);
+    final nameController = TextEditingController(text: _profile!['name'] ?? '');
+    final phoneController = TextEditingController(text: _profile!['phone'] ?? '');
+    final cityController = TextEditingController(text: _profile!['city'] ?? '');
     final formKey = GlobalKey<FormState>();
     final theme = Theme.of(context);
 
@@ -62,15 +64,41 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       builder: (dialogCtx) => AlertDialog(
         backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Update Primary City', style: TextStyle(color: theme.textTheme.bodyLarge?.color, fontWeight: FontWeight.bold)),
+        title: Text('Edit Profile Info', style: TextStyle(color: theme.textTheme.bodyLarge?.color, fontWeight: FontWeight.bold)),
         content: Form(
           key: formKey,
-          child: TextFormField(
-            controller: cityController,
-            decoration: const InputDecoration(
-              labelText: 'City Name',
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Full Name',
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  validator: (val) => val == null || val.trim().isEmpty ? 'Please enter name' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    prefixIcon: Icon(Icons.phone_outlined),
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: cityController,
+                  decoration: const InputDecoration(
+                    labelText: 'City Name',
+                    prefixIcon: Icon(Icons.location_city_outlined),
+                  ),
+                  validator: (val) => val == null || val.trim().isEmpty ? 'Please enter city' : null,
+                ),
+              ],
             ),
-            validator: (val) => val == null || val.trim().isEmpty ? 'Please enter city' : null,
           ),
         ),
         actions: [
@@ -87,10 +115,15 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               if (token == null) return;
 
               try {
-                await _customerService.updateMyProfile(token, cityController.text.trim());
+                await _customerService.updateMyProfile(
+                  token,
+                  name: nameController.text.trim(),
+                  phone: phoneController.text.trim(),
+                  city: cityController.text.trim(),
+                );
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('City updated successfully')),
+                    const SnackBar(content: Text('Profile updated successfully')),
                   );
                   _loadProfile();
                 }
@@ -103,7 +136,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                 }
               }
             },
-            child: const Text('Save Location', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Save Changes', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -291,9 +324,9 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton.icon(
-                          onPressed: _showEditCityDialog,
+                          onPressed: _showEditProfileDialog,
                           icon: const Icon(Icons.edit_rounded),
-                          label: const Text('Edit Location City', style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: const Text('Edit Profile Information', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                       const SizedBox(height: 12),

@@ -211,8 +211,11 @@ class _EmailOtpVerificationScreenState extends State<EmailOtpVerificationScreen>
                   ),
                   const SizedBox(height: 16),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 4,
+                    runSpacing: 4,
                     children: [
                       const Text("Didn't receive the email? "),
                       TextButton(

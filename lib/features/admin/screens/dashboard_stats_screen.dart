@@ -74,10 +74,6 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
               }
 
               final sales = snapshot.data ?? [];
-              final double totalGmv = sales.fold(0.0, (acc, item) {
-                final double amount = double.tryParse((item['total_amount'] ?? item['part_price'] ?? 0).toString()) ?? 0.0;
-                return acc + amount;
-              });
 
               return Column(
                 children: [
@@ -104,7 +100,7 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              '${sales.length} Verified Deliveries • Total: Rs. ${totalGmv.toStringAsFixed(2)}',
+                              '${sales.length} Verified Deliveries & Completed Sales',
                               style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -454,24 +450,76 @@ class _DashboardStatsScreenState extends State<DashboardStatsScreen> {
                               subtitle: 'LEADS',
                               onTap: () => widget.onTabChanged?.call(4), // Navigates to Commission Review
                             ),
-                            _buildStatCard(
-                              label: 'Parts Sold',
-                              value: _stats!.totalPartsSold,
-                              icon: Icons.verified_rounded,
-                              accentColor: const Color(0xff00E676),
-                              subtitle: 'DELIVERED',
-                              onTap: _showSalesProofDialog,
-                            ),
-                            _buildStatCard(
-                              label: 'Total Sales (GMV)',
-                              value: _stats!.totalSalesGMV,
-                              icon: Icons.monetization_on_rounded,
-                              accentColor: const Color(0xff00E676),
-                              subtitle: 'SALES PROOF',
-                              isCurrency: true,
-                              onTap: _showSalesProofDialog,
-                            ),
                           ],
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Featured Parts Sold / Verified Deliveries Card
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _showSalesProofDialog,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xff00E676).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: const Color(0xff00E676).withValues(alpha: 0.35), width: 1.5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xff00E676),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.verified_rounded, color: Colors.black, size: 22),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '${_stats!.totalPartsSold} Parts Sold & Verified',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: theme.textTheme.bodyLarge?.color,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xff00E676).withValues(alpha: 0.2),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: const Text(
+                                                'LIVE FEED',
+                                                style: TextStyle(color: Color(0xff00E676), fontWeight: FontWeight.bold, fontSize: 9),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Tap to view all customer purchases, buyer names, shops & barcode proofs',
+                                          style: TextStyle(fontSize: 11, color: theme.textTheme.bodyMedium?.color),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.chevron_right_rounded, color: Color(0xff00E676), size: 22),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 20),
 

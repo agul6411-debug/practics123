@@ -309,8 +309,10 @@ class _ReportReviewScreenState extends State<ReportReviewScreen> {
                                     const SizedBox(height: 16),
                                     const Divider(color: Color(0xffCCCCCC), height: 1),
                                     const SizedBox(height: 14),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                    Wrap(
+                                      alignment: WrapAlignment.end,
+                                      spacing: 8,
+                                      runSpacing: 8,
                                       children: [
                                         OutlinedButton.icon(
                                           onPressed: () => _handleAction(report.id, 'dismiss'),
@@ -322,7 +324,6 @@ class _ReportReviewScreenState extends State<ReportReviewScreen> {
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
                                         ElevatedButton.icon(
                                           onPressed: () => _handleAction(report.id, 'resolve'),
                                           icon: const Icon(Icons.check_circle_outline_rounded, size: 18),

@@ -31,9 +31,29 @@ class CustomerService {
     return response['data'];
   }
 
-  /// Updates customer city
-  Future<void> updateMyProfile(String token, String city) async {
-    await _apiClient.put('/customer/profile', {'city': city}, token: token);
+  /// Updates customer profile (name, phone, city)
+  Future<Map<String, dynamic>> updateMyProfile(
+    String token, {
+    String? name,
+    String? phone,
+    String? city,
+  }) async {
+    final body = <String, dynamic>{};
+    if (name != null && name.trim().isNotEmpty) body['name'] = name.trim();
+    if (phone != null && phone.trim().isNotEmpty) body['phone'] = phone.trim();
+    if (city != null && city.trim().isNotEmpty) body['city'] = city.trim();
+
+    final response = await _apiClient.put('/customer/profile', body, token: token);
+    return response['data'] ?? {};
+  }
+
+  /// Cancels an order request submitted by customer
+  Future<void> cancelRequest(String token, int requestId, {String? reason}) async {
+    await _apiClient.put(
+      '/customer/requests/$requestId/cancel',
+      {'reason': reason ?? 'Cancelled by customer'},
+      token: token,
+    );
   }
 
   /// Searches for available phone parts with optional filters

@@ -31,6 +31,13 @@ class VendorService {
     return list.map((item) => PartModel.fromJson(item)).toList();
   }
 
+  /// Fetches verified sold parts history for vendor
+  Future<List<Map<String, dynamic>>> getMySoldParts(String token) async {
+    final response = await _apiClient.get('/vendor/parts/sold', token: token);
+    final List list = response['data'] ?? [];
+    return List<Map<String, dynamic>>.from(list);
+  }
+
   /// Adds a new part
   Future<PartModel> addPart(
     String token,

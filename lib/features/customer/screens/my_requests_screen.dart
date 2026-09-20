@@ -75,12 +75,72 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) return;
 
-
     try {
       await _customerService.confirmDelivery(token, req.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('✅ Delivery confirmed! Sale completed successfully.'), backgroundColor: Colors.green),
+        );
+        _loadRequests();
+      }
+    } catch (e) {
+      if (mounted) {
+        final msg = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleCancelRequest(RequestModel req) async {
+    final reasonController = TextEditingController();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Cancel Request', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Are you sure you want to cancel your request for "${req.modelName}"?'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                labelText: 'Reason for Cancellation (Optional)',
+                hintText: 'e.g. Found elsewhere / Ordered by mistake',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Keep Order')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Cancel Order', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) return;
+
+    try {
+      await _customerService.cancelRequest(
+        token,
+        req.id,
+        reason: reasonController.text.trim().isNotEmpty ? reasonController.text.trim() : 'Cancelled by customer',
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Order cancelled successfully'), backgroundColor: Colors.orange),
         );
         _loadRequests();
       }
@@ -160,6 +220,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                       final bool isDelivered = req.status.toLowerCase() == 'delivered';
                       final bool canConfirmDelivery = (req.status == 'responded' || req.status == 'available') && !isDelivered;
                       final bool canReview = req.status == 'responded' || req.status == 'available' || isDelivered;
+                      final bool canCancel = req.status != 'cancelled' && !isDelivered;
                       final statusColor = _getStatusColor(req.status);
 
                       final theme = Theme.of(context);
@@ -241,11 +302,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Shop: ${req.shopName} (${req.vendorCity})',
-                                        style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontWeight: FontWeight.w500, fontSize: 12),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -306,8 +362,11 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                ),
                              ],
                              const SizedBox(height: 10),
-                             Row(
-                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             Wrap(
+                               alignment: WrapAlignment.spaceBetween,
+                               crossAxisAlignment: WrapCrossAlignment.center,
+                               spacing: 8,
+                               runSpacing: 4,
                                children: [
                                  Column(
                                    crossAxisAlignment: CrossAxisAlignment.start,
@@ -384,6 +443,18 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                                     label: const Text('Scan QR', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                                   ),
                                 ],
+                                if (canCancel)
+                                  OutlinedButton.icon(
+                                    onPressed: () => _handleCancelRequest(req),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                      side: const BorderSide(color: Colors.red),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    ),
+                                    icon: const Icon(Icons.cancel_outlined, size: 16, color: Colors.red),
+                                    label: const Text('Cancel Order', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                  ),
                                 if (canReview)
                                   ElevatedButton.icon(
                                     onPressed: () async {

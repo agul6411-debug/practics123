@@ -120,23 +120,26 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (index) {
-                      final starValue = index + 1;
-                      return IconButton(
-                        iconSize: 40,
-                        icon: Icon(
-                          starValue <= _selectedRating ? Icons.star_rounded : Icons.star_outline_rounded,
-                          color: Colors.amber,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _selectedRating = starValue;
-                          });
-                        },
-                      );
-                    }),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        final starValue = index + 1;
+                        return IconButton(
+                          iconSize: 40,
+                          icon: Icon(
+                            starValue <= _selectedRating ? Icons.star_rounded : Icons.star_outline_rounded,
+                            color: Colors.amber,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _selectedRating = starValue;
+                            });
+                          },
+                        );
+                      }),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
