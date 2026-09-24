@@ -581,15 +581,22 @@ class _MyPartsScreenState extends State<MyPartsScreen> with SingleTickerProvider
                 const SizedBox(height: 12),
                 const Divider(color: Color(0xffCCCCCC), height: 1),
                 const SizedBox(height: 12),
-                Row(
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
-                    const Icon(Icons.person_outline_rounded, size: 16, color: Colors.grey),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        'Buyer: $customerName ($customerCity)',
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.person_outline_rounded, size: 16, color: Colors.grey),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Buyer: $customerName ($customerCity)',
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        ),
+                      ],
                     ),
                     if (customerPhone.isNotEmpty)
                       Text(
@@ -599,15 +606,23 @@ class _MyPartsScreenState extends State<MyPartsScreen> with SingleTickerProvider
                   ],
                 ),
                 const SizedBox(height: 6),
-                Row(
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
-                    const Icon(Icons.local_shipping_outlined, size: 16, color: Colors.grey),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Delivery: ${deliveryType == 'home_delivery' ? 'Home Delivery' : 'Pickup at Shop'}',
-                      style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.local_shipping_outlined, size: 16, color: Colors.grey),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Delivery: ${deliveryType == 'home_delivery' ? 'Home Delivery' : 'Pickup at Shop'}',
+                          style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                        ),
+                      ],
                     ),
-                    const Spacer(),
                     if (verifiedBarcode.isNotEmpty)
                       Text(
                         'Barcode: $verifiedBarcode',

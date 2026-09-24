@@ -344,11 +344,20 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text('Total Bill Amount:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                                    Text(
-                                      selectedDeliveryType == 'home_delivery'
-                                          ? 'Rs. ${totalBill.toStringAsFixed(2)} (Incl. Rs. 200 Delivery)'
-                                          : 'Rs. ${itemPrice.toStringAsFixed(2)}',
-                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: theme.primaryColor),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            selectedDeliveryType == 'home_delivery'
+                                                ? 'Rs. ${totalBill.toStringAsFixed(2)} (Incl. Rs. 200 Delivery)'
+                                                : 'Rs. ${itemPrice.toStringAsFixed(2)}',
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: theme.primaryColor),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -569,9 +578,13 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
                     ],
                   ),
                 ),
-                Text(
-                  'Rs. ${price.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: theme.primaryColor),
+                const SizedBox(width: 8),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Rs. ${price.toStringAsFixed(2)}',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: theme.primaryColor),
+                  ),
                 ),
               ],
             ),

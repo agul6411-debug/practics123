@@ -232,151 +232,159 @@ class _BrowseHomeScreenState extends State<BrowseHomeScreen> {
                             ],
                           ),
                         )
-                      : GridView.builder(
-                          padding: const EdgeInsets.all(14.0),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.65,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
-                          itemCount: _parts.length,
-                          itemBuilder: (ctx, index) {
-                            final part = _parts[index];
-                            final String? fullImageUrl = part.imageUrl != null && part.imageUrl!.isNotEmpty
-                                ? '${ApiConstants.baseUrl}${part.imageUrl}'
-                                : null;
+                      : LayoutBuilder(
+                          builder: (context, constraints) {
+                            final double width = constraints.maxWidth;
+                            final double itemWidth = (width - 40) / 2;
+                            final double childAspectRatio = (itemWidth / 235).clamp(0.60, 0.75);
 
-                            return InkWell(
-                              onTap: () {
-                                Get.toNamed(AppRoutes.partDetail, arguments: part.id);
-                              },
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: theme.cardColor,
+                            return GridView.builder(
+                              padding: const EdgeInsets.all(14.0),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: childAspectRatio,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                              ),
+                              itemCount: _parts.length,
+                              itemBuilder: (ctx, index) {
+                                final part = _parts[index];
+                                final String? fullImageUrl = part.imageUrl != null && part.imageUrl!.isNotEmpty
+                                    ? '${ApiConstants.baseUrl}${part.imageUrl}'
+                                    : null;
+
+                                return InkWell(
+                                  onTap: () {
+                                    Get.toNamed(AppRoutes.partDetail, arguments: part.id);
+                                  },
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: const Color(0xffE2E8F0)),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Product Image Thumbnail
-                                    Expanded(
-                                      child: Stack(
-                                        children: [
-                                          Container(
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                              color: theme.scaffoldBackgroundColor,
-                                              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-                                              child: fullImageUrl != null
-                                                  ? Image.network(
-                                                      fullImageUrl,
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported_rounded, color: Colors.grey, size: 36),
-                                                    )
-                                                  : const Icon(Icons.image_search_rounded, color: Colors.grey, size: 36),
-                                            ),
-                                          ),
-                                          if (part.stockQuantity <= 0 || part.status.toLowerCase() == 'out_of_stock')
-                                            Positioned(
-                                              top: 8,
-                                              left: 8,
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: theme.cardColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: const Color(0xffE2E8F0)),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Product Image Thumbnail
+                                        Expanded(
+                                          child: Stack(
+                                            children: [
+                                              Container(
+                                                width: double.infinity,
                                                 decoration: BoxDecoration(
-                                                  color: Colors.red,
-                                                  borderRadius: BorderRadius.circular(6),
+                                                  color: theme.scaffoldBackgroundColor,
+                                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                                                 ),
-                                                child: const Text(
-                                                  'SOLD OUT',
-                                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
+                                                child: ClipRRect(
+                                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                                                  child: fullImageUrl != null
+                                                      ? Image.network(
+                                                          fullImageUrl,
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported_rounded, color: Colors.grey, size: 36),
+                                                        )
+                                                      : const Icon(Icons.image_search_rounded, color: Colors.grey, size: 36),
                                                 ),
                                               ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    // Part Details Info Panel
-                                    Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            part.modelName,
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: theme.textTheme.bodyLarge?.color),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            '${part.brandName ?? ''} • ${part.partTypeName ?? ''}',
-                                            style: TextStyle(fontSize: 11, color: theme.textTheme.bodyMedium?.color),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: FittedBox(
-                                                  fit: BoxFit.scaleDown,
-                                                  alignment: Alignment.centerLeft,
-                                                  child: Text(
-                                                    'Rs. ${part.price.toStringAsFixed(2)}',
-                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.primaryColor),
+                                              if (part.stockQuantity <= 0 || part.status.toLowerCase() == 'out_of_stock')
+                                                Positioned(
+                                                  top: 8,
+                                                  left: 8,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red,
+                                                      borderRadius: BorderRadius.circular(6),
+                                                    ),
+                                                    child: const Text(
+                                                      'SOLD OUT',
+                                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: theme.primaryColor.withValues(alpha: 0.12),
-                                                  borderRadius: BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                  part.conditionType.toUpperCase(),
-                                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: theme.primaryColor),
-                                                ),
-                                              ),
                                             ],
                                           ),
-                                          const SizedBox(height: 4),
-                                          Row(
+                                        ),
+
+                                        // Part Details Info Panel
+                                        Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              const Icon(Icons.location_on_rounded, size: 12, color: Colors.grey),
-                                              const SizedBox(width: 2),
-                                              Expanded(
-                                                child: Text(
-                                                  part.vendorCity.isEmpty ? 'Marketplace' : part.vendorCity,
-                                                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
+                                              Text(
+                                                part.modelName,
+                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: theme.textTheme.bodyLarge?.color),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              if (part.averageRating > 0) ...[
-                                                const Icon(Icons.star_rounded, size: 12, color: Colors.amber),
-                                                Text(
-                                                  part.averageRating.toStringAsFixed(1),
-                                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                                                ),
-                                              ],
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                '${part.brandName ?? ''} • ${part.partTypeName ?? ''}',
+                                                style: TextStyle(fontSize: 11, color: theme.textTheme.bodyMedium?.color),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      alignment: Alignment.centerLeft,
+                                                      child: Text(
+                                                        'Rs. ${part.price.toStringAsFixed(2)}',
+                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.primaryColor),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                    decoration: BoxDecoration(
+                                                      color: theme.primaryColor.withValues(alpha: 0.12),
+                                                      borderRadius: BorderRadius.circular(6),
+                                                    ),
+                                                    child: Text(
+                                                      part.conditionType.toUpperCase(),
+                                                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: theme.primaryColor),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Row(
+                                                children: [
+                                                  const Icon(Icons.location_on_rounded, size: 12, color: Colors.grey),
+                                                  const SizedBox(width: 2),
+                                                  Expanded(
+                                                    child: Text(
+                                                      part.vendorCity.isEmpty ? 'Marketplace' : part.vendorCity,
+                                                      style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (part.averageRating > 0) ...[
+                                                    const Icon(Icons.star_rounded, size: 12, color: Colors.amber),
+                                                    Text(
+                                                      part.averageRating.toStringAsFixed(1),
+                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
                                             ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                );
+                              },
                             );
                           },
                         ),

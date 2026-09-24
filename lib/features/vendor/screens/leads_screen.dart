@@ -184,7 +184,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Are you sure you want to cancel this customer order? Note: Cancelling orders online is tracked. Reaching 3 order cancellations will AUTOMATICALLY BLOCK your account.',
+              'Are you sure you want to cancel this customer order? The customer will be notified and product stock will be automatically restored to your inventory.',
               style: TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 12),
@@ -217,13 +217,12 @@ class _LeadsScreenState extends State<LeadsScreen> {
     try {
       final res = await _vendorService.cancelOrder(token, lead.id, reasonController.text.trim());
       if (mounted) {
-        final bool isAutoBlocked = res['is_auto_blocked'] == true;
         final String message = res['message'] ?? 'Order cancelled successfully';
 
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text(isAutoBlocked ? '🚨 ACCOUNT BLOCKED!' : 'Order Cancelled'),
+            title: const Text('Order Cancelled'),
             content: Text(message),
             actions: [
               ElevatedButton(
@@ -251,6 +250,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -262,13 +262,16 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 Expanded(
                   child: Text(
                     lead.partModelName,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(lead.status).withValues(alpha: 0.2),
+                    color: _getStatusColor(lead.status).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: _getStatusColor(lead.status)),
                   ),
@@ -308,17 +311,17 @@ class _LeadsScreenState extends State<LeadsScreen> {
             const SizedBox(height: 8),
             Text('Customer: ${lead.customerName ?? 'N/A'}', style: const TextStyle(fontWeight: FontWeight.w600)),
             if (lead.customerPhone != null && lead.customerPhone!.isNotEmpty)
-              Text('Phone: ${lead.customerPhone}'),
-            if (lead.customerEmail != null) Text('Email: ${lead.customerEmail}'),
-            if (lead.customerCity != null) Text('City: ${lead.customerCity}'),
+              Text('Phone: ${lead.customerPhone}', style: const TextStyle(fontSize: 13)),
+            if (lead.customerEmail != null) Text('Email: ${lead.customerEmail}', style: const TextStyle(fontSize: 13)),
+            if (lead.customerCity != null) Text('City: ${lead.customerCity}', style: const TextStyle(fontSize: 13)),
             if (lead.deliveryType == 'home_delivery' && lead.deliveryAddress != null) ...[
               const SizedBox(height: 4),
               Text(
                 'Delivery Address: ${lead.deliveryAddress}, ${lead.deliveryCity ?? ''}',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent, fontSize: 12),
               ),
               if (lead.deliveryNotes != null && lead.deliveryNotes!.isNotEmpty)
-                Text('Notes: ${lead.deliveryNotes}', style: const TextStyle(fontStyle: FontStyle.italic)),
+                Text('Notes: ${lead.deliveryNotes}', style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 12)),
             ],
             if (lead.status == 'cancelled' && lead.cancellationReason != null) ...[
               const SizedBox(height: 6),
@@ -334,13 +337,44 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 ),
               ),
             ],
-            Text(
-              lead.deliveryType == 'home_delivery'
-                  ? 'Part Price: Rs. ${lead.partPrice.toStringAsFixed(2)} | Delivery Fee: Rs. 200 | Total Bill: Rs. ${(lead.partPrice + 200).toStringAsFixed(2)}'
-                  : 'Part Price: Rs. ${lead.partPrice.toStringAsFixed(2)} (Shop Pickup)',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xffE2E8F0)),
+              ),
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 12,
+                runSpacing: 4,
+                children: [
+                  Text(
+                    'Part: Rs. ${lead.partPrice.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
+                  if (lead.deliveryType == 'home_delivery')
+                    const Text(
+                      'Delivery Fee: Rs. 200.00',
+                      style: TextStyle(fontSize: 12, color: Colors.blueAccent, fontWeight: FontWeight.w500),
+                    ),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'Total: Rs. ${(lead.deliveryType == 'home_delivery' ? lead.partPrice + 200 : lead.partPrice).toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const Divider(height: 24),
+            const Divider(height: 20),
             Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
